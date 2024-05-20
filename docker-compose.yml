@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres
+    container_name: postgres-authuser
+    environment:
+      POSTGRES_DB: authuser
+      POSTGRES_USER: joel
+      POSTGRES_PASSWORD: postgres123456
+    ports:
+      - "5432:5432"
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
