@@ -7,9 +7,9 @@ services:
     environment:
       POSTGRES_DB: authuser
       POSTGRES_USER: joel
-      POSTGRES_PASSWORD: postgres123456
+      POSTGRES_PASSWORD: docker
     ports:
-      - "5432:5432"
+      - "5433:5432"
     networks:
       - mynetwork
 

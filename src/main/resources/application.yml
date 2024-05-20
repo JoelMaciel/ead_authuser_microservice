@@ -1,10 +1,19 @@
+server:
+  port: 8087
+
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/authuser
+    url: jdbc:postgresql://localhost:5433/authuser
     username: joel
-    password: postgres123456
+    password: docker
   jpa:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
+        show-sql: true
+        jdbc:
+          lob.non-contextual-creation: true
+  flyway:
+    locations: classpath:db/migration, classpath:db/testdb
+    baselineOnMigrate: true
+

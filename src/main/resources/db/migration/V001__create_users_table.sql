@@ -1,0 +1,14 @@
+CREATE TABLE USERS (
+    user_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(100) NOT NULL,
+    full_name VARCHAR(150) NOT NULL,
+    user_status VARCHAR(50) CHECK(user_status IN ('ACTIVE', 'BLOCKED')) NOT NULL,
+    user_type VARCHAR(50) CHECK(user_type IN ('ADMIN', 'STUDENT', 'INSTRUCTOR')) NOT NULL,
+    phone_number VARCHAR(20) NOT NULL,
+    cpf VARCHAR(20) NOT NULL,
+    image_url TEXT,
+    creation_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    update_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
