@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,19 +33,22 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public UserDTO updateUser(@PathVariable UUID userId, @RequestBody UserUpdateRequestDTO userUpdate) {
+    public UserDTO updateUser(@PathVariable UUID userId, @RequestBody @Valid UserUpdateRequestDTO userUpdate) {
         return userService.update(userId, userUpdate);
     }
 
     @PatchMapping("/{userId}/password")
-    public ResponseEntity<Object> updatePassword(@PathVariable UUID userId, @RequestBody UserUpdatePasswordRequestDTO userUpdatePasswordRequestDTO) {
+    public ResponseEntity<Object> updatePassword(
+            @PathVariable UUID userId,
+            @RequestBody @Valid UserUpdatePasswordRequestDTO userUpdatePasswordRequestDTO
+    ) {
         userService.updatePassword(userId, userUpdatePasswordRequestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(MSG_UPDATE_PASSWORD);
     }
 
     @PatchMapping("/{userId}/image")
-    public UserDTO updateImage(@PathVariable UUID userId, @RequestBody UserUpdateImageRequestDTO updateImageDTO) {
-        return  userService.updateImage(userId, updateImageDTO);
+    public UserDTO updateImage(@PathVariable UUID userId, @RequestBody @Valid UserUpdateImageRequestDTO updateImageDTO) {
+        return userService.updateImage(userId, updateImageDTO);
     }
 
     @DeleteMapping("/{userId}")
