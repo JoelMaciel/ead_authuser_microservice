@@ -9,8 +9,15 @@
 ### authenticating login sessions, and managing access permissions and roles.
 
 ## Technology used :
--  JAVA 11 --- DOCKER  --- OPEN API (SWAGGER)
--  SPRING SECURITY --- SPRING DATA JPA --- POSTGRESQL - FLYWAY
--  UNIT TESTING , INTEGRATION  AND  E2E (JUNIT5-MOCKITO) --- JACOCO
+-  JAVA 11 
+-  DOCKER
+-  UNIT TESTING, INTEGRATION AND E2E USING JUNIT5 AND MOCKITO.
+-  POSTGRESQL - FLYWAY
+-  JPA PERSISTENCE - SPRING DATA JPA
+-  SPRING SECURITY
+-  SPRING HATEOAS
+-  OPEN API (SWAGGER)
+-  VALIDATION
+-  JACOCO
 
 ## Project under construction....
