@@ -46,7 +46,6 @@ public class UserConverter {
                 .fullName(userRequestDTO.getFullName())
                 .phoneNumber(userRequestDTO.getPhoneNumber())
                 .cpf(userRequestDTO.getCpf())
-                .imageUrl(userRequestDTO.getImageUrl())
                 .build();
     }
 
