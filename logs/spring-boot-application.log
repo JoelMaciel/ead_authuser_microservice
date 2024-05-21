@@ -1,0 +1,97 @@
+2024-05-20 15:36:28.715  INFO 21002 --- [main] com.ead.authuser.AuthuserApplication     : Starting AuthuserApplication using Java 11.0.20 on joelmaciel with PID 21002 (/home/joelmaciel/1_Projetos/java/ead/authuser/target/classes started by joelmaciel in /home/joelmaciel/1_Projetos/java/ead/authuser)
+2024-05-20 15:36:28.720 DEBUG 21002 --- [main] com.ead.authuser.AuthuserApplication     : Running with Spring Boot v2.5.4, Spring v5.3.9
+2024-05-20 15:36:28.720  INFO 21002 --- [main] com.ead.authuser.AuthuserApplication     : No active profile set, falling back to default profiles: default
+2024-05-20 15:36:29.638  INFO 21002 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-05-20 15:36:29.747  INFO 21002 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 100 ms. Found 1 JPA repository interfaces.
+2024-05-20 15:36:30.374  INFO 21002 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8087 (http)
+2024-05-20 15:36:30.386  INFO 21002 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2024-05-20 15:36:30.387  INFO 21002 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.52]
+2024-05-20 15:36:30.454  INFO 21002 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2024-05-20 15:36:30.454  INFO 21002 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1675 ms
+2024-05-20 15:36:30.602  INFO 21002 --- [main] o.f.c.internal.license.VersionPrinter    : Flyway Community Edition 7.7.3 by Redgate
+2024-05-20 15:36:30.614  INFO 21002 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2024-05-20 15:36:30.755  INFO 21002 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2024-05-20 15:36:30.778  INFO 21002 --- [main] o.f.c.i.database.base.DatabaseType       : Database: jdbc:postgresql://localhost:5433/authuser (PostgreSQL 16.2)
+2024-05-20 15:36:30.785  WARN 21002 --- [main] o.f.c.internal.database.base.Database    : Flyway upgrade recommended: org.flywaydb.core.internal.database.postgresql.PostgreSQLDatabaseType@1c34365c 16.2 is newer than this version of Flyway and support has not been tested. The latest supported version of org.flywaydb.core.internal.database.postgresql.PostgreSQLDatabaseType@1c34365c is 13.
+2024-05-20 15:36:30.823  INFO 21002 --- [main] o.f.core.internal.command.DbValidate     : Successfully validated 1 migration (execution time 00:00.020s)
+2024-05-20 15:36:30.834  INFO 21002 --- [main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 001
+2024-05-20 15:36:30.836  INFO 21002 --- [main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2024-05-20 15:36:30.856  INFO 21002 --- [main] o.f.c.i.c.SqlScriptCallbackFactory       : Executing SQL callback: afterMigrate - 
+2024-05-20 15:36:30.861  INFO 21002 --- [main] o.f.c.i.s.DefaultSqlScriptExecutor       : 3 rows affected
+2024-05-20 15:36:30.864  INFO 21002 --- [main] o.f.c.i.s.DefaultSqlScriptExecutor       : 3 rows affected
+2024-05-20 15:36:30.994  INFO 21002 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-05-20 15:36:31.062  INFO 21002 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.4.32.Final
+2024-05-20 15:36:31.181  INFO 21002 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2024-05-20 15:36:31.280  INFO 21002 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.PostgreSQLDialect
+2024-05-20 15:36:31.788  INFO 21002 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2024-05-20 15:36:31.796  INFO 21002 --- [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-05-20 15:36:32.326  WARN 21002 --- [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-05-20 15:36:32.418 DEBUG 21002 --- [main] s.w.s.m.m.a.RequestMappingHandlerAdapter : ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2024-05-20 15:36:32.475 DEBUG 21002 --- [main] s.w.s.m.m.a.RequestMappingHandlerMapping : 6 mappings in 'requestMappingHandlerMapping'
+2024-05-20 15:36:32.502 DEBUG 21002 --- [main] o.s.w.s.handler.SimpleUrlHandlerMapping  : Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+2024-05-20 15:36:32.510 DEBUG 21002 --- [main] .m.m.a.ExceptionHandlerExceptionResolver : ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+2024-05-20 15:36:32.635  INFO 21002 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8087 (http) with context path ''
+2024-05-20 15:36:32.646  INFO 21002 --- [main] com.ead.authuser.AuthuserApplication     : Started AuthuserApplication in 4.46 seconds (JVM running for 4.873)
+2024-05-20 15:36:35.387  INFO 21002 --- [http-nio-8087-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-05-20 15:36:35.387  INFO 21002 --- [http-nio-8087-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2024-05-20 15:36:35.387 DEBUG 21002 --- [http-nio-8087-exec-2] o.s.web.servlet.DispatcherServlet        : Detected StandardServletMultipartResolver
+2024-05-20 15:36:35.387 DEBUG 21002 --- [http-nio-8087-exec-2] o.s.web.servlet.DispatcherServlet        : Detected AcceptHeaderLocaleResolver
+2024-05-20 15:36:35.387 DEBUG 21002 --- [http-nio-8087-exec-2] o.s.web.servlet.DispatcherServlet        : Detected FixedThemeResolver
+2024-05-20 15:36:35.388 DEBUG 21002 --- [http-nio-8087-exec-2] o.s.web.servlet.DispatcherServlet        : Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@4bc9451b
+2024-05-20 15:36:35.388 DEBUG 21002 --- [http-nio-8087-exec-2] o.s.web.servlet.DispatcherServlet        : Detected org.springframework.web.servlet.support.SessionFlashMapManager@61aa6300
+2024-05-20 15:36:35.388 DEBUG 21002 --- [http-nio-8087-exec-2] o.s.web.servlet.DispatcherServlet        : enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+2024-05-20 15:36:35.388  INFO 21002 --- [http-nio-8087-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2024-05-20 15:36:35.393 DEBUG 21002 --- [http-nio-8087-exec-2] o.s.web.servlet.DispatcherServlet        : GET "/api/users", parameters={}
+2024-05-20 15:36:35.396 DEBUG 21002 --- [http-nio-8087-exec-2] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.ead.authuser.api.controllers.UserController#getAllUsers()
+2024-05-20 15:36:35.504 DEBUG 21002 --- [http-nio-8087-exec-2] org.hibernate.SQL                        : select usermodel0_.user_id as user_id1_0_, usermodel0_.cpf as cpf2_0_, usermodel0_.creation_date as creation3_0_, usermodel0_.email as email4_0_, usermodel0_.full_name as full_nam5_0_, usermodel0_.image_url as image_ur6_0_, usermodel0_.password as password7_0_, usermodel0_.phone_number as phone_nu8_0_, usermodel0_.update_date as update_d9_0_, usermodel0_.user_status as user_st10_0_, usermodel0_.user_type as user_ty11_0_, usermodel0_.username as usernam12_0_ from users usermodel0_
+2024-05-20 15:36:35.538 DEBUG 21002 --- [http-nio-8087-exec-2] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/json, application/*+json]
+2024-05-20 15:36:35.539 DEBUG 21002 --- [http-nio-8087-exec-2] m.m.a.RequestResponseBodyMethodProcessor : Writing [[com.ead.authuser.domain.dtos.response.UserDTO@a77215b, com.ead.authuser.domain.dtos.response.UserDTO@10be9af6, com.ea (truncated)...]
+2024-05-20 15:36:35.585 DEBUG 21002 --- [http-nio-8087-exec-2] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2024-05-20 15:37:10.520 DEBUG 21002 --- [http-nio-8087-exec-3] o.s.web.servlet.DispatcherServlet        : POST "/api/auth/signup", parameters={}
+2024-05-20 15:37:10.521 DEBUG 21002 --- [http-nio-8087-exec-3] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.ead.authuser.api.controllers.AuthenticationController#registerUser(UserRequestDTO)
+2024-05-20 15:37:10.546 DEBUG 21002 --- [http-nio-8087-exec-3] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [com.ead.authuser.domain.dtos.request.UserRequestDTO@5743f3c0]
+2024-05-20 15:37:10.564 DEBUG 21002 --- [http-nio-8087-exec-3] org.hibernate.SQL                        : select usermodel0_.user_id as col_0_0_ from users usermodel0_ where usermodel0_.username=? limit ?
+2024-05-20 15:37:10.569 DEBUG 21002 --- [http-nio-8087-exec-3] org.hibernate.SQL                        : select usermodel0_.user_id as col_0_0_ from users usermodel0_ where usermodel0_.email=? limit ?
+2024-05-20 15:37:10.590 DEBUG 21002 --- [http-nio-8087-exec-3] org.hibernate.SQL                        : insert into users (cpf, creation_date, email, full_name, image_url, password, phone_number, update_date, user_status, user_type, username, user_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2024-05-20 15:37:10.604 DEBUG 21002 --- [http-nio-8087-exec-3] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/json, application/*+json]
+2024-05-20 15:37:10.604 DEBUG 21002 --- [http-nio-8087-exec-3] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.ead.authuser.domain.dtos.response.UserDTO@7162a367]
+2024-05-20 15:37:10.606 DEBUG 21002 --- [http-nio-8087-exec-3] o.s.web.servlet.DispatcherServlet        : Completed 201 CREATED
+2024-05-20 15:38:50.992  INFO 21002 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-05-20 15:38:50.993  INFO 21002 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2024-05-20 15:38:51.016  INFO 21002 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2024-05-20 15:39:07.656  INFO 21309 --- [main] com.ead.authuser.AuthuserApplication     : Starting AuthuserApplication using Java 11.0.20 on joelmaciel with PID 21309 (/home/joelmaciel/1_Projetos/java/ead/authuser/target/classes started by joelmaciel in /home/joelmaciel/1_Projetos/java/ead/authuser)
+2024-05-20 15:39:07.658 DEBUG 21309 --- [main] com.ead.authuser.AuthuserApplication     : Running with Spring Boot v2.5.4, Spring v5.3.9
+2024-05-20 15:39:07.658  INFO 21309 --- [main] com.ead.authuser.AuthuserApplication     : No active profile set, falling back to default profiles: default
+2024-05-20 15:39:08.748  INFO 21309 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-05-20 15:39:08.791  INFO 21309 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 34 ms. Found 1 JPA repository interfaces.
+2024-05-20 15:39:09.356  INFO 21309 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8087 (http)
+2024-05-20 15:39:09.370  INFO 21309 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2024-05-20 15:39:09.370  INFO 21309 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.52]
+2024-05-20 15:39:09.435  INFO 21309 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2024-05-20 15:39:09.435  INFO 21309 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1689 ms
+2024-05-20 15:39:09.568  INFO 21309 --- [main] o.f.c.internal.license.VersionPrinter    : Flyway Community Edition 7.7.3 by Redgate
+2024-05-20 15:39:09.576  INFO 21309 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2024-05-20 15:39:09.729  INFO 21309 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2024-05-20 15:39:09.761  INFO 21309 --- [main] o.f.c.i.database.base.DatabaseType       : Database: jdbc:postgresql://localhost:5433/authuser (PostgreSQL 16.2)
+2024-05-20 15:39:09.770  WARN 21309 --- [main] o.f.c.internal.database.base.Database    : Flyway upgrade recommended: org.flywaydb.core.internal.database.postgresql.PostgreSQLDatabaseType@337a6d30 16.2 is newer than this version of Flyway and support has not been tested. The latest supported version of org.flywaydb.core.internal.database.postgresql.PostgreSQLDatabaseType@337a6d30 is 13.
+2024-05-20 15:39:09.801  INFO 21309 --- [main] o.f.core.internal.command.DbValidate     : Successfully validated 1 migration (execution time 00:00.014s)
+2024-05-20 15:39:09.809  INFO 21309 --- [main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 001
+2024-05-20 15:39:09.810  INFO 21309 --- [main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2024-05-20 15:39:09.824  INFO 21309 --- [main] o.f.c.i.c.SqlScriptCallbackFactory       : Executing SQL callback: afterMigrate - 
+2024-05-20 15:39:09.827  INFO 21309 --- [main] o.f.c.i.s.DefaultSqlScriptExecutor       : 4 rows affected
+2024-05-20 15:39:09.828  INFO 21309 --- [main] o.f.c.i.s.DefaultSqlScriptExecutor       : 3 rows affected
+2024-05-20 15:39:09.971  INFO 21309 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-05-20 15:39:10.017  INFO 21309 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.4.32.Final
+2024-05-20 15:39:10.149  INFO 21309 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2024-05-20 15:39:10.262  INFO 21309 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.PostgreSQLDialect
+2024-05-20 15:39:10.880  INFO 21309 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2024-05-20 15:39:10.890  INFO 21309 --- [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-05-20 15:39:11.358  WARN 21309 --- [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-05-20 15:39:11.677  INFO 21309 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8087 (http) with context path ''
+2024-05-20 15:39:11.693  INFO 21309 --- [main] com.ead.authuser.AuthuserApplication     : Started AuthuserApplication in 4.625 seconds (JVM running for 5.02)
+2024-05-20 15:39:17.158  INFO 21309 --- [http-nio-8087-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-05-20 15:39:17.159  INFO 21309 --- [http-nio-8087-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2024-05-20 15:39:17.160  INFO 21309 --- [http-nio-8087-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2024-05-20 15:41:05.613  INFO 21309 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-05-20 15:41:05.615  INFO 21309 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2024-05-20 15:41:05.620  INFO 21309 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.

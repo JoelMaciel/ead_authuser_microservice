@@ -1,9 +1,12 @@
 package com.ead.authuser.domain.models;
 
 import com.ead.authuser.domain.enums.UserStatus;
+import com.ead.authuser.domain.enums.UserType;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -12,7 +15,9 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder(toBuilder = true)
 @Entity
 @Table(name = "USERS")
 public class UserModel {
@@ -30,7 +35,7 @@ public class UserModel {
     private UserStatus userStatus;
 
     @Enumerated(EnumType.STRING)
-    private UserStatus userType;
+    private UserType userType;
 
     private String phoneNumber;
     private String cpf;
