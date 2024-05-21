@@ -1,25 +1,22 @@
 package com.ead.authuser.domain.converter;
 
-import com.ead.authuser.domain.dtos.request.UserUpdatePasswordRequestDTO;
 import com.ead.authuser.domain.dtos.request.UserRequestDTO;
 import com.ead.authuser.domain.dtos.request.UserUpdateImageRequestDTO;
+import com.ead.authuser.domain.dtos.request.UserUpdatePasswordRequestDTO;
 import com.ead.authuser.domain.dtos.request.UserUpdateRequestDTO;
 import com.ead.authuser.domain.dtos.response.UserDTO;
 import com.ead.authuser.domain.models.UserModel;
+import org.springframework.data.domain.Page;
 
 import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class UserConverter {
 
     private UserConverter() {
     }
 
-    public static List<UserDTO> toDTOList(List<UserModel> users) {
-        return users.stream()
-                .map(UserConverter::toDTO)
-                .collect(Collectors.toList());
+    public static Page<UserDTO> toDTOPage(Page<UserModel> users) {
+        return users.map(UserConverter::toDTO);
     }
 
     public static UserDTO toDTO(UserModel user) {

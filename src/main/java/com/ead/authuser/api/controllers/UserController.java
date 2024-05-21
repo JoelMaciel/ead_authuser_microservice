@@ -1,17 +1,21 @@
 package com.ead.authuser.api.controllers;
 
-import com.ead.authuser.domain.dtos.request.UserUpdatePasswordRequestDTO;
-import com.ead.authuser.domain.dtos.response.UserDTO;
 import com.ead.authuser.domain.dtos.request.UserUpdateImageRequestDTO;
+import com.ead.authuser.domain.dtos.request.UserUpdatePasswordRequestDTO;
 import com.ead.authuser.domain.dtos.request.UserUpdateRequestDTO;
+import com.ead.authuser.domain.dtos.response.UserDTO;
 import com.ead.authuser.domain.services.UserService;
+import com.ead.authuser.domain.specification.SpecificationTemplate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -23,8 +27,11 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public List<UserDTO> getAllUsers() {
-        return userService.findAll();
+    public Page<UserDTO> getAllUsers(
+            SpecificationTemplate.UserSpec spec,
+            @PageableDefault(page = 0, size = 10, sort = "userId", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        return userService.findAll(spec, pageable);
     }
 
     @GetMapping("/{userId}")

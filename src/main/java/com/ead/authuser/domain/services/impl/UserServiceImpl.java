@@ -1,5 +1,6 @@
 package com.ead.authuser.domain.services.impl;
 
+import com.ead.authuser.api.controllers.UserController;
 import com.ead.authuser.domain.converter.UserConverter;
 import com.ead.authuser.domain.dtos.request.UserRequestDTO;
 import com.ead.authuser.domain.dtos.request.UserUpdateImageRequestDTO;
@@ -16,10 +17,15 @@ import com.ead.authuser.domain.models.UserModel;
 import com.ead.authuser.domain.repositories.UserRepository;
 import com.ead.authuser.domain.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -31,9 +37,11 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public List<UserDTO> findAll() {
-        List<UserModel> users = userRepository.findAll();
-        return UserConverter.toDTOList(users);
+    public Page<UserDTO> findAll(Specification<UserModel> spec, Pageable pageable) {
+        Page<UserModel> users = userRepository.findAll(spec, pageable);
+        Page<UserDTO> userDTOS = UserConverter.toDTOPage(users);
+        addHateoasLinks(userDTOS);
+        return userDTOS;
     }
 
     @Override
@@ -102,6 +110,14 @@ public class UserServiceImpl implements UserService {
     public UserModel optionalUser(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
+    }
+
+    private void addHateoasLinks(Page<UserDTO> usersDtos) {
+        if (!usersDtos.isEmpty()) {
+            for (UserDTO userDTO : usersDtos) {
+                userDTO.add(linkTo(methodOn(UserController.class).getOneUser(userDTO.getUserId())).withSelfRel());
+            }
+        }
     }
 
     private void validatePassword(UserUpdatePasswordRequestDTO userUpdatePasswordRequestDTO, UserModel user) {
