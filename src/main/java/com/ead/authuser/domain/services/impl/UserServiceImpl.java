@@ -39,9 +39,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<UserDTO> findAll(Specification<UserModel> spec, Pageable pageable) {
         Page<UserModel> users = userRepository.findAll(spec, pageable);
-        Page<UserDTO> userDTOS = UserConverter.toDTOPage(users);
-        addHateoasLinks(userDTOS);
-        return userDTOS;
+        Page<UserDTO> usersPageDTO = UserConverter.toDTOPage(users);
+        addHateoasLinks(usersPageDTO);
+        return usersPageDTO;
     }
 
     @Override
