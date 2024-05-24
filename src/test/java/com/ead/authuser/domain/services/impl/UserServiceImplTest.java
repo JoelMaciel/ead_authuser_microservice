@@ -32,8 +32,6 @@ import static org.mockito.MockitoAnnotations.openMocks;
 
 class UserServiceImplTest {
 
-    public static final String MSG_USER_NOT_FOUND = "User not found for this userId d935ef3e-b7cf-4efb-a8ca-140ac13ae479";
-
     @InjectMocks
     private UserServiceImpl userService;
 
@@ -46,6 +44,7 @@ class UserServiceImplTest {
     private UserModel userModel;
     private UserRequestDTO userRequestDTO;
     private UserUpdateRequestDTO userUpdateRequestDTO;
+    private UUID invalidUserId;
 
 
     @BeforeEach
@@ -55,6 +54,7 @@ class UserServiceImplTest {
         userModel = TestUtil.getUserModelMock();
         userRequestDTO = TestUtil.getUserRequestDTOMock();
         userUpdateRequestDTO = TestUtil.getUserUpdateRequestDTO();
+        invalidUserId = UUID.randomUUID();
     }
 
     @Test
@@ -90,14 +90,14 @@ class UserServiceImplTest {
     @Test
     @DisplayName("Given UserId Invalid When FindById Then Should Throw Exception")
     void givenUserIdInvalid_WhenFindById_ThenShouldThrowException() {
-        when(userRepository.findById(userModel.getUserId())).thenReturn(Optional.empty());
+        when(userRepository.findById(invalidUserId)).thenReturn(Optional.empty());
 
         UserNotFoundException exception = assertThrows(UserNotFoundException.class,
-                () -> userService.findById(userModel.getUserId()));
+                () -> userService.findById(invalidUserId));
 
-        assertEquals(MSG_USER_NOT_FOUND, exception.getMessage());
+        assertEquals("User not found for this userId " + invalidUserId, exception.getMessage());
 
-        verify(userRepository, times(1)).findById(userModel.getUserId());
+        verify(userRepository, times(1)).findById(invalidUserId);
     }
 
     @Test
@@ -145,11 +145,11 @@ class UserServiceImplTest {
         when(userRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
 
         UserNotFoundException exception = assertThrows(UserNotFoundException.class,
-                () -> userService.update(userModel.getUserId(), userUpdateRequestDTO));
+                () -> userService.update(invalidUserId, userUpdateRequestDTO));
 
-        assertEquals(MSG_USER_NOT_FOUND, exception.getMessage());
+        assertEquals("User not found for this userId " + invalidUserId, exception.getMessage());
 
-        verify(userRepository, times(1)).findById(userModel.getUserId());
+        verify(userRepository, times(1)).findById(invalidUserId);
         verify(userRepository, never()).save(any(UserModel.class));
     }
 
