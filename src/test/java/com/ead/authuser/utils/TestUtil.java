@@ -29,22 +29,6 @@ public class TestUtil {
                 .build();
     }
 
-    public static UserModel getUserModelMockTwo() {
-        return UserModel.builder()
-                .userId(UUID.randomUUID())
-                .username("joelmacieltestTwo")
-                .email("joeltesterwo@example.com")
-                .password("123456")
-                .fullName("user1joeltwo")
-                .phoneNumber("+55 085999884477")
-                .userStatus(UserStatus.ACTIVE)
-                .userType(UserType.STUDENT)
-                .cpf("908599956568")
-                .creationDate(OffsetDateTime.now())
-                .updateDate(OffsetDateTime.now())
-                .build();
-    }
-
     public static UserRequestDTO getUserRequestDTOMock() {
         return UserRequestDTO.builder()
                 .username("nametest")
@@ -52,7 +36,18 @@ public class TestUtil {
                 .fullName("fullnametest")
                 .phoneNumber("+55 085999999999")
                 .password("12345678")
-                .cpf("121212121212")
+                .cpf("259.725.320-18")
+                .build();
+    }
+
+    public static UserRequestDTO getInvalidFieldsUserRequestDTOMock() {
+        return UserRequestDTO.builder()
+                .username("joel")
+                .email("joelgmail.com")
+                .fullName("maciel")
+                .phoneNumber("")
+                .password("12345678")
+                .cpf("0000212")
                 .build();
     }
 
@@ -63,6 +58,7 @@ public class TestUtil {
                 .fullName("fullnametest")
                 .build();
     }
+
 
     public static UserUpdateRequestDTO getUserUpdateRequestDTO() {
         return UserUpdateRequestDTO.builder()
@@ -89,8 +85,13 @@ public class TestUtil {
 
     public static UserUpdatePasswordRequestDTO getUserUpdateInvalidPasswordRequestDTO() {
         return UserUpdatePasswordRequestDTO.builder()
-                .password("1234567891")
-                .oldPassword("1234567777")
+                .password("123456")
+                .oldPassword("123456")
+                .build();
+    }
+
+    public static UserUpdatePasswordRequestDTO getUserUpdateNullFieldsPasswordRequestDTO() {
+        return UserUpdatePasswordRequestDTO.builder()
                 .build();
     }
 
@@ -100,4 +101,9 @@ public class TestUtil {
                 .build();
     }
 
+    public static UserUpdateImageRequestDTO getUpdateBlankImageRequestDTO() {
+        return UserUpdateImageRequestDTO.builder()
+                .imageUrl("")
+                .build();
+    }
 }
