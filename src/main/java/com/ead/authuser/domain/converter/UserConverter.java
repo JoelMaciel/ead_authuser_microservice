@@ -55,14 +55,20 @@ public class UserConverter {
                 .build();
     }
 
-    public static UserModel toUpdatePasswordEntity(UserModel user, UserUpdatePasswordRequestDTO userUpdatePasswordRequestDTO) {
+    public static UserModel toUpdatePasswordEntity(
+            UserModel user,
+            UserUpdatePasswordRequestDTO userUpdatePasswordRequestDTO
+    ) {
         return user.toBuilder()
                 .password(userUpdatePasswordRequestDTO.getPassword())
                 .updateDate(OffsetDateTime.now())
                 .build();
     }
 
-    public static UserModel toUpdateImageEntity(UserModel user, UserUpdateImageRequestDTO userUpdateImageRequestDTO) {
+    public static UserModel toUpdateImageEntity(
+            UserModel user,
+            UserUpdateImageRequestDTO userUpdateImageRequestDTO
+    ) {
         return user.toBuilder()
                 .imageUrl(userUpdateImageRequestDTO.getImageUrl())
                 .updateDate(OffsetDateTime.now())
