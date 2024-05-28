@@ -4,11 +4,13 @@ import com.ead.authuser.domain.dtos.response.UserDTO;
 import com.ead.authuser.domain.dtos.request.UserRequestDTO;
 import com.ead.authuser.domain.services.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+@Log4j2
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/auth")

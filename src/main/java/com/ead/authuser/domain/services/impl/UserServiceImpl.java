@@ -17,6 +17,7 @@ import com.ead.authuser.domain.models.UserModel;
 import com.ead.authuser.domain.repositories.UserRepository;
 import com.ead.authuser.domain.services.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.UUID;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -41,12 +43,15 @@ public class UserServiceImpl implements UserService {
         Page<UserModel> users = userRepository.findAll(spec, pageable);
         Page<UserDTO> usersPageDTO = UserConverter.toDTOPage(users);
         addHateoasLinks(usersPageDTO);
+        log.debug("GET  UserDTO received {} ", usersPageDTO.toString());
+
         return usersPageDTO;
     }
 
     @Override
     public UserDTO findById(UUID userId) {
         UserModel user = optionalUser(userId);
+        log.debug("GET UserDTO received {} ", user.toString());
         return UserConverter.toDTO(user);
     }
 
@@ -55,12 +60,14 @@ public class UserServiceImpl implements UserService {
     public UserDTO update(UUID userId, UserUpdateRequestDTO userUpdateDTO) {
         UserModel user = optionalUser(userId);
         UserModel userUpdate = UserConverter.toUpdateEntity(userUpdateDTO, user);
+        log.debug("PUT  UserDTO updated received {} ", userUpdate.toString());
         return UserConverter.toDTO(userRepository.save(userUpdate));
     }
 
     @Transactional
     @Override
     public UserDTO save(UserRequestDTO userRequestDTO) {
+        log.debug("POST registerUser UserRequestDTO received {} ", userRequestDTO.toString());
         UserModel userModel = UserConverter.toEntity(userRequestDTO);
 
         validateUser(userRequestDTO);
@@ -68,7 +75,9 @@ public class UserServiceImpl implements UserService {
         userModel.setUserStatus(UserStatus.ACTIVE);
         userModel.setUserType(UserType.STUDENT);
 
-        return UserConverter.toDTO(userRepository.save(userModel));
+        UserModel userSaved = userRepository.save(userModel);
+        log.debug("POST registerUser UserModel saved {} ", userSaved.toString());
+        return UserConverter.toDTO(userSaved);
     }
 
     @Override
@@ -76,6 +85,7 @@ public class UserServiceImpl implements UserService {
     public UserDTO updateImage(UUID userId, UserUpdateImageRequestDTO updateImageDTO) {
         UserModel userModel = optionalUser(userId);
         UserModel newUser = UserConverter.toUpdateImageEntity(userModel, updateImageDTO);
+        log.debug("PATCH updated image {} ", newUser.toString());
         return UserConverter.toDTO(userRepository.save(newUser));
     }
 
@@ -87,6 +97,7 @@ public class UserServiceImpl implements UserService {
         validatePassword(userUpdatePasswordRequestDTO, user);
 
         UserModel userUpdated = UserConverter.toUpdatePasswordEntity(user, userUpdatePasswordRequestDTO);
+        log.debug("PATCH updated password {} ", userUpdated.toString());
         userRepository.save(userUpdated);
     }
 
@@ -94,6 +105,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(UUID userId) {
         optionalUser(userId);
+        log.debug("DELETE UserModel Deleted {} ", userId);
         userRepository.deleteById(userId);
     }
 
