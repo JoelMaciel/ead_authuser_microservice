@@ -16,3 +16,10 @@ spring:
   flyway:
     locations: classpath:db/migration, classpath:db/testdb
     baselineOnMigrate: true
+
+logging:
+  level:
+    com.ead: TRACE
+    root: INFO
+    org.springframework.web: DEBUG
+    org.hibernate: INFO
