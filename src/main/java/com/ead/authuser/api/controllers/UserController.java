@@ -29,9 +29,10 @@ public class UserController {
     @GetMapping
     public Page<UserDTO> getAllUsers(
             SpecificationTemplate.UserSpec spec,
-            @PageableDefault(page = 0, size = 10, sort = "userId", direction = Sort.Direction.ASC) Pageable pageable
+            @PageableDefault(page = 0, size = 10, sort = "userId", direction = Sort.Direction.ASC) Pageable pageable,
+            @RequestParam(required = false) UUID courseId
     ) {
-        return userService.findAll(spec, pageable);
+        return userService.findAll(spec, pageable, courseId);
     }
 
     @GetMapping("/{userId}")

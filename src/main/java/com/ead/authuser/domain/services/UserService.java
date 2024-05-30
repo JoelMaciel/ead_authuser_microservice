@@ -14,7 +14,7 @@ import java.util.UUID;
 
 public interface UserService {
 
-    Page<UserDTO> findAll(Specification<UserModel> spec, Pageable pageable);
+    Page<UserDTO> findAll(Specification<UserModel> spec, Pageable pageable, UUID courseId);
 
     UserDTO findById(UUID userId);
 
