@@ -1,5 +1,6 @@
 package com.ead.authuser.domain.models;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -7,6 +8,7 @@ import javax.persistence.*;
 import java.util.UUID;
 
 @Data
+@Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "USERS_COURSES")

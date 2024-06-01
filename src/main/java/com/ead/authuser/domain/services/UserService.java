@@ -28,6 +28,8 @@ public interface UserService {
 
     void delete(UUID userId);
 
+    UserModel optionalUser(UUID userId);
+
     boolean existsByUserName(String username);
 
     boolean existsByEmail(String email);
