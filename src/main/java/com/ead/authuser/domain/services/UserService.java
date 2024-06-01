@@ -1,9 +1,6 @@
 package com.ead.authuser.domain.services;
 
-import com.ead.authuser.domain.dtos.request.UserRequestDTO;
-import com.ead.authuser.domain.dtos.request.UserUpdateImageRequestDTO;
-import com.ead.authuser.domain.dtos.request.UserUpdatePasswordRequestDTO;
-import com.ead.authuser.domain.dtos.request.UserUpdateRequestDTO;
+import com.ead.authuser.domain.dtos.request.*;
 import com.ead.authuser.domain.dtos.response.UserDTO;
 import com.ead.authuser.domain.models.UserModel;
 import org.springframework.data.domain.Page;
@@ -34,4 +31,5 @@ public interface UserService {
 
     boolean existsByEmail(String email);
 
+    UserDTO saveInstructor(InstructorRequestDTO instructorRequestDTO);
 }

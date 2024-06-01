@@ -2,10 +2,7 @@ package com.ead.authuser.domain.services.impl;
 
 import com.ead.authuser.api.controllers.UserController;
 import com.ead.authuser.domain.converter.UserConverter;
-import com.ead.authuser.domain.dtos.request.UserRequestDTO;
-import com.ead.authuser.domain.dtos.request.UserUpdateImageRequestDTO;
-import com.ead.authuser.domain.dtos.request.UserUpdatePasswordRequestDTO;
-import com.ead.authuser.domain.dtos.request.UserUpdateRequestDTO;
+import com.ead.authuser.domain.dtos.request.*;
 import com.ead.authuser.domain.dtos.response.UserDTO;
 import com.ead.authuser.domain.enums.UserStatus;
 import com.ead.authuser.domain.enums.UserType;
@@ -86,6 +83,15 @@ public class UserServiceImpl implements UserService {
         UserModel userSaved = userRepository.save(userModel);
         log.debug("POST registerUser UserModel saved {} ", userSaved.toString());
         return UserConverter.toDTO(userSaved);
+    }
+
+    @Override
+    @Transactional
+    public UserDTO saveInstructor(InstructorRequestDTO instructorRequestDTO) {
+        UserModel user = optionalUser(instructorRequestDTO.getUserId());
+        UserModel userInstructor = UserConverter.toInstructor(user);
+
+        return UserConverter.toDTO(userRepository.save(userInstructor));
     }
 
     @Override

@@ -1,10 +1,8 @@
 package com.ead.authuser.domain.converter;
 
-import com.ead.authuser.domain.dtos.request.UserRequestDTO;
-import com.ead.authuser.domain.dtos.request.UserUpdateImageRequestDTO;
-import com.ead.authuser.domain.dtos.request.UserUpdatePasswordRequestDTO;
-import com.ead.authuser.domain.dtos.request.UserUpdateRequestDTO;
+import com.ead.authuser.domain.dtos.request.*;
 import com.ead.authuser.domain.dtos.response.UserDTO;
+import com.ead.authuser.domain.enums.UserType;
 import com.ead.authuser.domain.models.UserModel;
 import org.springframework.data.domain.Page;
 
@@ -71,6 +69,13 @@ public class UserConverter {
     ) {
         return user.toBuilder()
                 .imageUrl(userUpdateImageRequestDTO.getImageUrl())
+                .updateDate(OffsetDateTime.now())
+                .build();
+    }
+
+    public static UserModel toInstructor(UserModel user) {
+        return user.toBuilder()
+                .userType(UserType.INSTRUCTOR)
                 .updateDate(OffsetDateTime.now())
                 .build();
     }
