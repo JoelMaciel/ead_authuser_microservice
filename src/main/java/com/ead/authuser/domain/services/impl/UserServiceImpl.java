@@ -2,10 +2,7 @@ package com.ead.authuser.domain.services.impl;
 
 import com.ead.authuser.api.controllers.UserController;
 import com.ead.authuser.domain.converter.UserConverter;
-import com.ead.authuser.domain.dtos.request.UserRequestDTO;
-import com.ead.authuser.domain.dtos.request.UserUpdateImageRequestDTO;
-import com.ead.authuser.domain.dtos.request.UserUpdatePasswordRequestDTO;
-import com.ead.authuser.domain.dtos.request.UserUpdateRequestDTO;
+import com.ead.authuser.domain.dtos.request.*;
 import com.ead.authuser.domain.dtos.response.UserDTO;
 import com.ead.authuser.domain.enums.UserStatus;
 import com.ead.authuser.domain.enums.UserType;
@@ -13,21 +10,25 @@ import com.ead.authuser.domain.exceptions.EmailAlreadyExistsException;
 import com.ead.authuser.domain.exceptions.PasswordMismatchedException;
 import com.ead.authuser.domain.exceptions.UserNotFoundException;
 import com.ead.authuser.domain.exceptions.UsernameAlreadyExistsException;
+import com.ead.authuser.domain.models.UserCourseModel;
 import com.ead.authuser.domain.models.UserModel;
+import com.ead.authuser.domain.repositories.UserCourseRepository;
 import com.ead.authuser.domain.repositories.UserRepository;
 import com.ead.authuser.domain.services.UserService;
+import com.ead.authuser.domain.specification.SpecificationTemplate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
-
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.UUID;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Log4j2
 @Service
@@ -37,15 +38,23 @@ public class UserServiceImpl implements UserService {
     public static final String MSG_USERNAME_ALREADY_EXISTS = "There is already a user registered with this Username.";
     public static final String MSG_EMAIL_ALREADY_EXISTS = "This email is already registered in the database.";
     private final UserRepository userRepository;
+    private final UserCourseRepository userCourseRepository;
 
     @Override
-    public Page<UserDTO> findAll(Specification<UserModel> spec, Pageable pageable) {
-        Page<UserModel> users = userRepository.findAll(spec, pageable);
-        Page<UserDTO> usersPageDTO = UserConverter.toDTOPage(users);
+    public Page<UserDTO> findAll(Specification<UserModel> spec, Pageable pageable, UUID courseId) {
+        Specification<UserModel> finalSpec = createSpecificationWithCourseId(spec, courseId);
+
+        Page<UserModel> userModelPage = userRepository.findAll(finalSpec, pageable);
+        Page<UserDTO> usersPageDTO = UserConverter.toDTOPage(userModelPage);
         addHateoasLinks(usersPageDTO);
-        log.debug("GET  UserDTO received {} ", usersPageDTO.toString());
+
+        log.debug("GET UserDTO received: {}", usersPageDTO.toString());
 
         return usersPageDTO;
+    }
+
+    private Specification<UserModel> createSpecificationWithCourseId(Specification<UserModel> spec, UUID courseId) {
+        return (courseId != null) ? SpecificationTemplate.userCourseId(courseId).and(spec) : spec;
     }
 
     @Override
@@ -82,6 +91,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    public UserDTO saveInstructor(InstructorRequestDTO instructorRequestDTO) {
+        UserModel user = optionalUser(instructorRequestDTO.getUserId());
+        UserModel userInstructor = UserConverter.toInstructor(user);
+
+        return UserConverter.toDTO(userRepository.save(userInstructor));
+    }
+
+    @Override
+    @Transactional
     public UserDTO updateImage(UUID userId, UserUpdateImageRequestDTO updateImageDTO) {
         UserModel userModel = optionalUser(userId);
         UserModel newUser = UserConverter.toUpdateImageEntity(userModel, updateImageDTO);
@@ -105,6 +123,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(UUID userId) {
         optionalUser(userId);
+        deleteUserCourse(userId);
         log.debug("DELETE UserModel Deleted {} ", userId);
         userRepository.deleteById(userId);
     }
@@ -119,6 +138,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.existsByEmail(email);
     }
 
+    @Override
     public UserModel optionalUser(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
@@ -145,6 +165,13 @@ public class UserServiceImpl implements UserService {
 
         if (existsByEmail(userRequestDTO.getEmail())) {
             throw new EmailAlreadyExistsException(MSG_EMAIL_ALREADY_EXISTS);
+        }
+    }
+
+    private void deleteUserCourse(UUID userId) {
+        List<UserCourseModel> userCourseModels = userCourseRepository.findAllUserCourseIntoUser(userId);
+        if (!userCourseModels.isEmpty()) {
+            userCourseRepository.deleteAll(userCourseModels);
         }
     }
 }
