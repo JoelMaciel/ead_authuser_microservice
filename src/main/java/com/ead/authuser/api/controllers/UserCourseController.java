@@ -19,13 +19,13 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/users/{userId}/courses")
 public class UserCourseController {
 
+    public static final String MSG_DELETED_SUCCESSFULLY = "UserCourse deleted successfully";
     private final CourseClient courseClient;
     private final UserCourseService userCourseService;
 
-    @GetMapping
+    @GetMapping("/api/users/{userId}/courses")
     public ResponseEntity<Page<CourseDTO>> getAllCoursesByUser(
             @PageableDefault(page = 0, size = 10, sort = "courseId", direction = Sort.Direction.ASC) Pageable pageable,
             @PathVariable UUID userId
@@ -34,11 +34,18 @@ public class UserCourseController {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/subscription")
+    @PostMapping("/api/users/{userId}/courses/subscription")
     public UserCourseDTO saveSubscriptionUserInCourse(
             @PathVariable UUID userId,
             @RequestBody @Valid UserCourseRequestDTO userCourseRequestDTO) {
         return userCourseService.save(userId, userCourseRequestDTO);
+    }
+
+    @DeleteMapping("/api/users/courses/{courseId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseEntity<Object> deleteUserCourseByCourse(@PathVariable UUID courseId) {
+        userCourseService.delete(courseId);
+        return ResponseEntity.status(HttpStatus.OK).body(MSG_DELETED_SUCCESSFULLY);
     }
 
 }
