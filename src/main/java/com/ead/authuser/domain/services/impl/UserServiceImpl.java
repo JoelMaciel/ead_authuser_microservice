@@ -1,5 +1,6 @@
 package com.ead.authuser.domain.services.impl;
 
+import com.ead.authuser.api.clients.CourseClient;
 import com.ead.authuser.api.controllers.UserController;
 import com.ead.authuser.domain.converter.UserConverter;
 import com.ead.authuser.domain.dtos.request.*;
@@ -39,6 +40,7 @@ public class UserServiceImpl implements UserService {
     public static final String MSG_EMAIL_ALREADY_EXISTS = "This email is already registered in the database.";
     private final UserRepository userRepository;
     private final UserCourseRepository userCourseRepository;
+    private final CourseClient courseClient;
 
     @Override
     public Page<UserDTO> findAll(Specification<UserModel> spec, Pageable pageable, UUID courseId) {
@@ -94,7 +96,7 @@ public class UserServiceImpl implements UserService {
     public UserDTO saveInstructor(InstructorRequestDTO instructorRequestDTO) {
         UserModel user = optionalUser(instructorRequestDTO.getUserId());
         UserModel userInstructor = UserConverter.toInstructor(user);
-
+        log.debug("UserInstructorId {} ", instructorRequestDTO.getUserId());
         return UserConverter.toDTO(userRepository.save(userInstructor));
     }
 
@@ -124,7 +126,7 @@ public class UserServiceImpl implements UserService {
     public void delete(UUID userId) {
         optionalUser(userId);
         deleteUserCourse(userId);
-        log.debug("DELETE UserModel Deleted {} ", userId);
+        log.debug("UserModel Deleted {} ", userId);
         userRepository.deleteById(userId);
     }
 
@@ -172,6 +174,7 @@ public class UserServiceImpl implements UserService {
         List<UserCourseModel> userCourseModels = userCourseRepository.findAllUserCourseIntoUser(userId);
         if (!userCourseModels.isEmpty()) {
             userCourseRepository.deleteAll(userCourseModels);
+            courseClient.deleteUserInCourse(userId);
         }
     }
 }
