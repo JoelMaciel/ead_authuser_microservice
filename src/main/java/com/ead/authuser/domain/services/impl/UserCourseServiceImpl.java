@@ -3,6 +3,7 @@ package com.ead.authuser.domain.services.impl;
 import com.ead.authuser.domain.converter.UserConverter;
 import com.ead.authuser.domain.dtos.UserCourseDTO;
 import com.ead.authuser.domain.dtos.request.UserCourseRequestDTO;
+import com.ead.authuser.domain.exceptions.UserCourseNotFoundException;
 import com.ead.authuser.domain.exceptions.SubscriptionAlreadyExistsException;
 import com.ead.authuser.domain.models.UserCourseModel;
 import com.ead.authuser.domain.models.UserModel;
@@ -10,11 +11,13 @@ import com.ead.authuser.domain.repositories.UserCourseRepository;
 import com.ead.authuser.domain.services.UserCourseService;
 import com.ead.authuser.domain.services.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+@Log4j2
 @RequiredArgsConstructor
 @Service
 public class UserCourseServiceImpl implements UserCourseService {
@@ -31,12 +34,28 @@ public class UserCourseServiceImpl implements UserCourseService {
         validateSubscriptionDoesNotExist(user, userCourseRequestDTO.getCourseId());
 
         UserCourseModel userCourseModel = toEntity(userCourseRequestDTO, user);
+        log.debug("Saved UserCourseModel {} ", userCourseModel.toString());
         return toDTO(userCourseRepository.save(userCourseModel));
     }
 
     @Override
     public boolean existsByUserAndCourseId(UserModel user, UUID courseId) {
         return userCourseRepository.existsByUserAndCourseId(user, courseId);
+    }
+
+    @Transactional
+    @Override
+    public void delete(UUID courseId) {
+        if (!existsByCourseId(courseId)) {
+            throw new UserCourseNotFoundException(courseId);
+        }
+        userCourseRepository.deleteAllByCourseId(courseId);
+        log.debug("CourseUser of CourseId {} deleted ", courseId);
+    }
+
+    @Override
+    public boolean existsByCourseId(UUID courseId) {
+        return userCourseRepository.existsByCourseId(courseId);
     }
 
     private void validateSubscriptionDoesNotExist(UserModel user, UUID courseId) {
