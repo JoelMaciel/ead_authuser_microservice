@@ -11,12 +11,9 @@ import com.ead.authuser.domain.exceptions.EmailAlreadyExistsException;
 import com.ead.authuser.domain.exceptions.PasswordMismatchedException;
 import com.ead.authuser.domain.exceptions.UserNotFoundException;
 import com.ead.authuser.domain.exceptions.UsernameAlreadyExistsException;
-import com.ead.authuser.domain.models.UserCourseModel;
 import com.ead.authuser.domain.models.UserModel;
-import com.ead.authuser.domain.repositories.UserCourseRepository;
 import com.ead.authuser.domain.repositories.UserRepository;
 import com.ead.authuser.domain.services.UserService;
-import com.ead.authuser.domain.specification.SpecificationTemplate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -25,7 +22,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -39,24 +35,18 @@ public class UserServiceImpl implements UserService {
     public static final String MSG_USERNAME_ALREADY_EXISTS = "There is already a user registered with this Username.";
     public static final String MSG_EMAIL_ALREADY_EXISTS = "This email is already registered in the database.";
     private final UserRepository userRepository;
-    private final UserCourseRepository userCourseRepository;
     private final CourseClient courseClient;
 
     @Override
-    public Page<UserDTO> findAll(Specification<UserModel> spec, Pageable pageable, UUID courseId) {
-        Specification<UserModel> finalSpec = createSpecificationWithCourseId(spec, courseId);
-
-        Page<UserModel> userModelPage = userRepository.findAll(finalSpec, pageable);
+    public Page<UserDTO> findAll(Specification<UserModel> spec, Pageable pageable) {
+        Page<UserModel> userModelPage = userRepository.findAll(spec, pageable);
         Page<UserDTO> usersPageDTO = UserConverter.toDTOPage(userModelPage);
+
         addHateoasLinks(usersPageDTO);
 
         log.debug("GET UserDTO received: {}", usersPageDTO.toString());
 
         return usersPageDTO;
-    }
-
-    private Specification<UserModel> createSpecificationWithCourseId(Specification<UserModel> spec, UUID courseId) {
-        return (courseId != null) ? SpecificationTemplate.userCourseId(courseId).and(spec) : spec;
     }
 
     @Override
@@ -125,7 +115,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(UUID userId) {
         optionalUser(userId);
-        deleteUserCourse(userId);
         log.debug("UserModel Deleted {} ", userId);
         userRepository.deleteById(userId);
     }
@@ -167,14 +156,6 @@ public class UserServiceImpl implements UserService {
 
         if (existsByEmail(userRequestDTO.getEmail())) {
             throw new EmailAlreadyExistsException(MSG_EMAIL_ALREADY_EXISTS);
-        }
-    }
-
-    private void deleteUserCourse(UUID userId) {
-        List<UserCourseModel> userCourseModels = userCourseRepository.findAllUserCourseIntoUser(userId);
-        if (!userCourseModels.isEmpty()) {
-            userCourseRepository.deleteAll(userCourseModels);
-            courseClient.deleteUserInCourse(userId);
         }
     }
 }
