@@ -21,6 +21,11 @@ spring:
   flyway:
     locations: classpath:db/migration, classpath:db/testdb
     baselineOnMigrate: true
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
 
 logging:
   level:
@@ -33,6 +38,8 @@ ead:
   api:
     url:
       course: 'http://ead-course-service/ead-course'
+  broker:
+    exchange: ead.userevent
 
 eureka:
   client:
