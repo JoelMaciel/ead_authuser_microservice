@@ -2,6 +2,7 @@ package com.ead.authuser.domain.services.impl;
 
 import com.ead.authuser.api.clients.CourseClient;
 import com.ead.authuser.api.controllers.UserController;
+import com.ead.authuser.api.publishers.UserEventPublisher;
 import com.ead.authuser.domain.converter.UserConverter;
 import com.ead.authuser.domain.dtos.request.*;
 import com.ead.authuser.domain.dtos.response.UserDTO;
@@ -35,7 +36,7 @@ public class UserServiceImpl implements UserService {
     public static final String MSG_USERNAME_ALREADY_EXISTS = "There is already a user registered with this Username.";
     public static final String MSG_EMAIL_ALREADY_EXISTS = "This email is already registered in the database.";
     private final UserRepository userRepository;
-    private final CourseClient courseClient;
+    private final UserEventPublisher userEventPublisher;
 
     @Override
     public Page<UserDTO> findAll(Specification<UserModel> spec, Pageable pageable) {
@@ -77,6 +78,9 @@ public class UserServiceImpl implements UserService {
         userModel.setUserType(UserType.STUDENT);
 
         UserModel userSaved = userRepository.save(userModel);
+
+        userEventPublisher.publishUserEvent(UserConverter.toEventDTO(userSaved));
+
         log.debug("POST registerUser UserModel saved {} ", userSaved.toString());
         return UserConverter.toDTO(userSaved);
     }

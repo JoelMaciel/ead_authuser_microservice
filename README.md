@@ -22,6 +22,14 @@
 
 ## Request Images
 
+### Eureka Server
+![Captura de tela de 2024-06-04 15-58-14](https://github.com/JoelMaciel/ead_authuser_microservice/assets/77079093/889152e3-89d5-4c75-ad44-a4a08a17159c)
+
+
+### RabbitMQ
+![Captura de tela de 2024-06-04 15-57-46](https://github.com/JoelMaciel/ead_authuser_microservice/assets/77079093/ad506570-a783-49d4-ac30-0f36d7b7837f)
+
+
 ### Test E2E
 ![Captura de tela de 2024-05-24 17-30-46](https://github.com/JoelMaciel/ead_authuser/assets/77079093/bbed1d4f-faec-474c-9b78-e14c991a46ba)
 ![Captura de tela de 2024-05-24 17-31-18](https://github.com/JoelMaciel/ead_authuser/assets/77079093/435c5841-8869-46e1-8fa4-459d4967fd40)

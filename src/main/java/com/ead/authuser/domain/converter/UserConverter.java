@@ -2,6 +2,8 @@ package com.ead.authuser.domain.converter;
 
 import com.ead.authuser.domain.dtos.request.*;
 import com.ead.authuser.domain.dtos.response.UserDTO;
+import com.ead.authuser.domain.dtos.response.UserEventDTO;
+import com.ead.authuser.domain.enums.ActionType;
 import com.ead.authuser.domain.enums.UserType;
 import com.ead.authuser.domain.models.UserModel;
 import org.springframework.data.domain.Page;
@@ -77,6 +79,19 @@ public class UserConverter {
         return user.toBuilder()
                 .userType(UserType.INSTRUCTOR)
                 .updateDate(OffsetDateTime.now())
+                .build();
+    }
+
+    public static UserEventDTO toEventDTO(UserModel userModel) {
+        return UserEventDTO.builder()
+                .userId(userModel.getUserId())
+                .username(userModel.getUsername())
+                .fullName(userModel.getFullName())
+                .email(userModel.getEmail())
+                .userStatus(String.valueOf(userModel.getUserStatus()))
+                .userType(String.valueOf(userModel.getUserType()))
+                .cpf(userModel.getCpf())
+                .actionType(String.valueOf(ActionType.CREATE))
                 .build();
     }
 }
