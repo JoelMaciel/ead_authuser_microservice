@@ -1,11 +1,11 @@
 package com.ead.authuser.domain.services.impl;
 
-import com.ead.authuser.api.clients.CourseClient;
 import com.ead.authuser.api.controllers.UserController;
 import com.ead.authuser.api.publishers.UserEventPublisher;
 import com.ead.authuser.domain.converter.UserConverter;
 import com.ead.authuser.domain.dtos.request.*;
 import com.ead.authuser.domain.dtos.response.UserDTO;
+import com.ead.authuser.domain.enums.ActionType;
 import com.ead.authuser.domain.enums.UserStatus;
 import com.ead.authuser.domain.enums.UserType;
 import com.ead.authuser.domain.exceptions.EmailAlreadyExistsException;
@@ -62,8 +62,10 @@ public class UserServiceImpl implements UserService {
     public UserDTO update(UUID userId, UserUpdateRequestDTO userUpdateDTO) {
         UserModel user = optionalUser(userId);
         UserModel userUpdate = UserConverter.toUpdateEntity(userUpdateDTO, user);
-        log.debug("PUT  UserDTO updated received {} ", userUpdate.toString());
-        return UserConverter.toDTO(userRepository.save(userUpdate));
+        userRepository.save(userUpdate);
+        userEventPublisher.publishUserEvent(UserConverter.toEventDTO(userUpdate, ActionType.UPDATE));
+        log.debug("UPDATE User and send broker {} -> ", userUpdate.toString());
+        return UserConverter.toDTO(userUpdate);
     }
 
     @Transactional
@@ -74,14 +76,13 @@ public class UserServiceImpl implements UserService {
 
         validateUser(userRequestDTO);
 
-        userModel.setUserStatus(UserStatus.ACTIVE);
-        userModel.setUserType(UserType.STUDENT);
+        userModel = UserConverter.configureUserStatusAndType(userModel, UserStatus.ACTIVE, UserType.STUDENT);
 
         UserModel userSaved = userRepository.save(userModel);
 
-        userEventPublisher.publishUserEvent(UserConverter.toEventDTO(userSaved));
+        userEventPublisher.publishUserEvent(UserConverter.toEventDTO(userSaved, ActionType.CREATE));
+        log.debug("POST - UserModel saved and send broker ->  {} ", userSaved.toString());
 
-        log.debug("POST registerUser UserModel saved {} ", userSaved.toString());
         return UserConverter.toDTO(userSaved);
     }
 
@@ -90,8 +91,13 @@ public class UserServiceImpl implements UserService {
     public UserDTO saveInstructor(InstructorRequestDTO instructorRequestDTO) {
         UserModel user = optionalUser(instructorRequestDTO.getUserId());
         UserModel userInstructor = UserConverter.toInstructor(user);
-        log.debug("UserInstructorId {} ", instructorRequestDTO.getUserId());
-        return UserConverter.toDTO(userRepository.save(userInstructor));
+
+        UserModel userUpdated = userRepository.save(userInstructor);
+
+        userEventPublisher.publishUserEvent(UserConverter.toEventDTO(userUpdated, ActionType.UPDATE));
+        log.debug("UserInstructorId save and send broker {} ", userUpdated.getUserId());
+
+        return UserConverter.toDTO(userUpdated);
     }
 
     @Override
@@ -118,9 +124,11 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void delete(UUID userId) {
-        optionalUser(userId);
-        log.debug("UserModel Deleted {} ", userId);
+        UserModel userModel = optionalUser(userId);
         userRepository.deleteById(userId);
+
+        userEventPublisher.publishUserEvent(UserConverter.toEventDTO(userModel, ActionType.DELETE));
+        log.info("UserModel Deleted and send broker {} ", userId);
     }
 
     @Override
