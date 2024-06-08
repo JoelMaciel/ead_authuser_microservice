@@ -3,6 +3,7 @@ package com.ead.authuser.api.clients;
 import com.ead.authuser.domain.dtos.response.CourseDTO;
 import com.ead.authuser.domain.dtos.response.ResponsePageDTO;
 import com.ead.authuser.domain.services.UtilsService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,21 +30,25 @@ public class CourseClient {
     @Value("${ead.api.url.course}")
     String REQUEST_URL_COURSE;
 
+    // @Retry(name = "retryInstance", fallbackMethod = "retryFallback")
+    @CircuitBreaker(name = "courseService")
     public Page<CourseDTO> getAllCoursesByUser(UUID userId, Pageable pageable) {
         List<CourseDTO> searchResult = null;
         ResponseEntity<ResponsePageDTO<CourseDTO>> result = null;
 
         String url = REQUEST_URL_COURSE + utilsService.createUrlGetAllCoursesByUser(userId, pageable);
-        log.debug("Request URL: {} ", url);
         log.info("Request URL: {} ", url);
 
         try {
             ParameterizedTypeReference<ResponsePageDTO<CourseDTO>> responseType =
                     new ParameterizedTypeReference<ResponsePageDTO<CourseDTO>>() {
                     };
+
             result = restTemplate.exchange(url, HttpMethod.GET, null, responseType);
+
             searchResult = result.getBody().getContent();
             log.debug("Response Number of Elements: {} ", searchResult.size());
+
         } catch (HttpStatusCodeException e) {
             log.error("Error request /courses {} ", e);
         }
