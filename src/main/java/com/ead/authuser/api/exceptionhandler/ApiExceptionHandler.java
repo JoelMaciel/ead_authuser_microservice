@@ -6,6 +6,7 @@ import com.ead.authuser.domain.exceptions.EntityNotFoundException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.PropertyBindingException;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.exception.ConstraintViolationException;
@@ -38,6 +39,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     public static final String MSG_GENERIC_ERROR_END_USER = "An unexpected internal system error has occurred. " +
             "Try again and if the problem persists, contact your system administrator.";
     public static final String ENTITY_IN_USE = "Entity cannot be deleted because it is in use";
+    public static final String MSG_AGAIN_IN_A_FEW_MOMENTS = "The system is currently unavailable, please try again in a few moments";
 
     private final MessageSource messageSource;
 
@@ -91,6 +93,33 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         Problem problem = createProblemBuilder(status, problemType, detail)
                 .userMessage(detail)
+                .build();
+
+        return handleExceptionInternal(ex, problem, new HttpHeaders(), status, webRequest);
+    }
+
+
+    @ExceptionHandler(CallNotPermittedException.class)
+    public ResponseEntity<?> handleCallNotPermitted(CallNotPermittedException ex, WebRequest webRequest) {
+        HttpStatus status = HttpStatus.SERVICE_UNAVAILABLE;
+        ProblemType problemType = ProblemType.SYSTEM_ERROR;
+        String detail = ex.getMessage();
+
+        Problem problem = createProblemBuilder(status, problemType, detail)
+                .userMessage(MSG_AGAIN_IN_A_FEW_MOMENTS)
+                .build();
+
+        return handleExceptionInternal(ex, problem, new HttpHeaders(), status, webRequest);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> handleCircuitBreaker(IllegalArgumentException ex, WebRequest webRequest) {
+        HttpStatus status = HttpStatus.SERVICE_UNAVAILABLE;
+        ProblemType problemType = ProblemType.SYSTEM_ERROR;
+        String detail = MSG_AGAIN_IN_A_FEW_MOMENTS;
+
+        Problem problem = createProblemBuilder(status, problemType, detail)
+                .userMessage(MSG_AGAIN_IN_A_FEW_MOMENTS)
                 .build();
 
         return handleExceptionInternal(ex, problem, new HttpHeaders(), status, webRequest);
