@@ -4,6 +4,7 @@ import com.ead.authuser.domain.dtos.request.*;
 import com.ead.authuser.domain.dtos.response.UserDTO;
 import com.ead.authuser.domain.dtos.response.UserEventDTO;
 import com.ead.authuser.domain.enums.ActionType;
+import com.ead.authuser.domain.enums.UserStatus;
 import com.ead.authuser.domain.enums.UserType;
 import com.ead.authuser.domain.models.UserModel;
 import org.springframework.data.domain.Page;
@@ -82,7 +83,14 @@ public class UserConverter {
                 .build();
     }
 
-    public static UserEventDTO toEventDTO(UserModel userModel) {
+    public static UserModel configureUserStatusAndType(UserModel user, UserStatus status, UserType type) {
+        return user.toBuilder()
+                .userStatus(status)
+                .userType(type)
+                .build();
+    }
+
+    public static UserEventDTO toEventDTO(UserModel userModel, ActionType actionType) {
         return UserEventDTO.builder()
                 .userId(userModel.getUserId())
                 .username(userModel.getUsername())
@@ -91,7 +99,8 @@ public class UserConverter {
                 .userStatus(String.valueOf(userModel.getUserStatus()))
                 .userType(String.valueOf(userModel.getUserType()))
                 .cpf(userModel.getCpf())
-                .actionType(String.valueOf(ActionType.CREATE))
+                .actionType(String.valueOf(actionType))
                 .build();
     }
+
 }
