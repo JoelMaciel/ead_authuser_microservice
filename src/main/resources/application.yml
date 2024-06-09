@@ -3,10 +3,15 @@ server:
   servlet:
     context-path: '/ead-authuser/'
 
-
 spring:
   application:
     name: ead-authuser-service
+  config:
+    import: 'optional:configserver:'
+  cloud:
+    config:
+      discovery:
+        serviceId: ead-config-server
   datasource:
     url: jdbc:postgresql://localhost:5433/authuser
     username: joel
