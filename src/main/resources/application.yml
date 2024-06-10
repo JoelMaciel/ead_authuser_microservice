@@ -1,66 +1,10 @@
-server:
-  port: 8087
-  servlet:
-    context-path: '/ead-authuser/'
-
 
 spring:
   application:
     name: ead-authuser-service
-  datasource:
-    url: jdbc:postgresql://localhost:5433/authuser
-    username: joel
-    password: docker
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        jdbc:
-          lob.non-contextual-creation: true
-    show-sql: true
-  flyway:
-    locations: classpath:db/migration, classpath:db/testdb
-    baselineOnMigrate: true
-  rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
-
-logging:
-  level:
-    com.ead: TRACE
-    root: INFO
-    org.springframework.web: DEBUG
-    org.hibernate: INFO
-
-ead:
-  api:
-    url:
-      course: 'http://ead-course-service/ead-course'
-  broker:
-    exchange: ead.userevent
-
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: 'http://localhost:8761/eureka'
-  instance:
-    hostname: localhost
-
-resilience4j:
-  circuitbreaker:
-    instances:
-      courseService:
-        slidingWindowSize: 5
-        permittedNumberOfCallsInHalfOpenState: 2
-        slidingWindowType: TIME_BASED
-        minimumNumberOfCalls: 2
-        waitDurationInOpenState: 20s
-        failureRateThreshold: 80
-  retry:
-    instances:
-      retryInstance:
-        maxAttempts: 3
-        waitDuration: 5s
-
+  config:
+    import: 'configserver:'
+  cloud:
+    config:
+      discovery:
+        serviceId: ead-config-server
