@@ -25,6 +25,18 @@ services:
     networks:
       - mynetwork
 
+  postgres_notification:
+    image: postgres
+    container_name: postgres-notification
+    environment:
+      POSTGRES_DB: notification
+      POSTGRES_USER: joel
+      POSTGRES_PASSWORD: docker
+    ports:
+      - "5435:5432"
+    networks:
+      - mynetwork
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
