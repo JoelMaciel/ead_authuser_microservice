@@ -6,14 +6,17 @@ import com.ead.authuser.domain.converter.UserConverter;
 import com.ead.authuser.domain.dtos.request.*;
 import com.ead.authuser.domain.dtos.response.UserDTO;
 import com.ead.authuser.domain.enums.ActionType;
+import com.ead.authuser.domain.enums.RoleType;
 import com.ead.authuser.domain.enums.UserStatus;
 import com.ead.authuser.domain.enums.UserType;
 import com.ead.authuser.domain.exceptions.EmailAlreadyExistsException;
 import com.ead.authuser.domain.exceptions.PasswordMismatchedException;
 import com.ead.authuser.domain.exceptions.UserNotFoundException;
 import com.ead.authuser.domain.exceptions.UsernameAlreadyExistsException;
+import com.ead.authuser.domain.models.RoleModel;
 import com.ead.authuser.domain.models.UserModel;
 import com.ead.authuser.domain.repositories.UserRepository;
+import com.ead.authuser.domain.services.RoleService;
 import com.ead.authuser.domain.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -37,6 +40,7 @@ public class UserServiceImpl implements UserService {
     public static final String MSG_EMAIL_ALREADY_EXISTS = "This email is already registered in the database.";
     private final UserRepository userRepository;
     private final UserEventPublisher userEventPublisher;
+    private final RoleService roleService;
 
     @Override
     public Page<UserDTO> findAll(Specification<UserModel> spec, Pageable pageable) {
@@ -78,6 +82,8 @@ public class UserServiceImpl implements UserService {
 
         userModel = UserConverter.configureUserStatusAndType(userModel, UserStatus.ACTIVE, UserType.STUDENT);
 
+        addRoleToUser(userModel, RoleType.ROLE_STUDENT);
+
         UserModel userSaved = userRepository.save(userModel);
 
         userEventPublisher.publishUserEvent(UserConverter.toEventDTO(userSaved, ActionType.CREATE));
@@ -95,7 +101,7 @@ public class UserServiceImpl implements UserService {
         UserModel userUpdated = userRepository.save(userInstructor);
 
         userEventPublisher.publishUserEvent(UserConverter.toEventDTO(userUpdated, ActionType.UPDATE));
-        log.debug("UserInstructorId save and send broker {} ", userUpdated.getUserId());
+        log.info("UserInstructorId save and send broker {} ", userUpdated.getUserId());
 
         return UserConverter.toDTO(userUpdated);
     }
@@ -105,7 +111,7 @@ public class UserServiceImpl implements UserService {
     public UserDTO updateImage(UUID userId, UserUpdateImageRequestDTO updateImageDTO) {
         UserModel userModel = optionalUser(userId);
         UserModel newUser = UserConverter.toUpdateImageEntity(userModel, updateImageDTO);
-        log.debug("PATCH updated image {} ", newUser.toString());
+        log.info("PATCH updated image {} ", newUser.toString());
         return UserConverter.toDTO(userRepository.save(newUser));
     }
 
@@ -117,7 +123,7 @@ public class UserServiceImpl implements UserService {
         validatePassword(userUpdatePasswordRequestDTO, user);
 
         UserModel userUpdated = UserConverter.toUpdatePasswordEntity(user, userUpdatePasswordRequestDTO);
-        log.debug("PATCH updated password {} ", userUpdated.toString());
+        log.info("PATCH updated password {} ", userUpdated.toString());
         userRepository.save(userUpdated);
     }
 
@@ -145,6 +151,11 @@ public class UserServiceImpl implements UserService {
     public UserModel optionalUser(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
+    }
+
+    private void addRoleToUser(UserModel user, RoleType roleType) {
+        RoleModel role = roleService.findByRoleName(roleType);
+        user.getRoles().add(role);
     }
 
     private void addHateoasLinks(Page<UserDTO> usersDtos) {

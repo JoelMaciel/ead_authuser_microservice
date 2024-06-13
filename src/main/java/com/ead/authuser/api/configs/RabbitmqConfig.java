@@ -1,4 +1,4 @@
-package com.ead.authuser.api.config;
+package com.ead.authuser.api.configs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
