@@ -18,6 +18,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -40,6 +41,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
             "Try again and if the problem persists, contact your system administrator.";
     public static final String ENTITY_IN_USE = "Entity cannot be deleted because it is in use";
     public static final String MSG_AGAIN_IN_A_FEW_MOMENTS = "The system is currently unavailable, please try again in a few moments";
+    public static final String INVALID_USERNAME_OR_PASSWORD = "Invalid username or password";
 
     private final MessageSource messageSource;
 
@@ -98,6 +100,18 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, problem, new HttpHeaders(), status, webRequest);
     }
 
+    @ExceptionHandler(InternalAuthenticationServiceException.class)
+    public ResponseEntity<?> internalAuthenticationService(InternalAuthenticationServiceException ex, WebRequest webRequest) {
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+        ProblemType problemType = ProblemType.INVALID_PARAMETER;
+        String detail = ex.getMessage();
+
+        Problem problem = createProblemBuilder(status, problemType, detail)
+                .userMessage(INVALID_USERNAME_OR_PASSWORD)
+                .build();
+
+        return handleExceptionInternal(ex, problem, new HttpHeaders(), status, webRequest);
+    }
 
     @ExceptionHandler(CallNotPermittedException.class)
     public ResponseEntity<?> handleCallNotPermitted(CallNotPermittedException ex, WebRequest webRequest) {
