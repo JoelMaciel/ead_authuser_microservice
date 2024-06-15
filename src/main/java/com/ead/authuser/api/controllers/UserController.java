@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -26,6 +27,7 @@ public class UserController {
     public static final String MSG_UPDATE_PASSWORD = "Password updated successfully.";
     private final UserService userService;
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
     @GetMapping
     public Page<UserDTO> getAllUsers(
             SpecificationTemplate.UserSpec spec,
@@ -34,6 +36,7 @@ public class UserController {
         return userService.findAll(spec, pageable);
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping("/{userId}")
     public UserDTO getOneUser(@PathVariable UUID userId) {
         return userService.findById(userId);

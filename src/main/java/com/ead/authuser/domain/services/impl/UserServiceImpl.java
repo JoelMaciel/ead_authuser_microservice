@@ -1,5 +1,6 @@
 package com.ead.authuser.domain.services.impl;
 
+import com.ead.authuser.api.configs.security.AuthenticationCurrentUserService;
 import com.ead.authuser.api.controllers.UserController;
 import com.ead.authuser.api.publishers.UserEventPublisher;
 import com.ead.authuser.domain.converter.UserConverter;
@@ -9,10 +10,7 @@ import com.ead.authuser.domain.enums.ActionType;
 import com.ead.authuser.domain.enums.RoleType;
 import com.ead.authuser.domain.enums.UserStatus;
 import com.ead.authuser.domain.enums.UserType;
-import com.ead.authuser.domain.exceptions.EmailAlreadyExistsException;
-import com.ead.authuser.domain.exceptions.PasswordMismatchedException;
-import com.ead.authuser.domain.exceptions.UserNotFoundException;
-import com.ead.authuser.domain.exceptions.UsernameAlreadyExistsException;
+import com.ead.authuser.domain.exceptions.*;
 import com.ead.authuser.domain.models.RoleModel;
 import com.ead.authuser.domain.models.UserModel;
 import com.ead.authuser.domain.repositories.UserRepository;
@@ -23,6 +21,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -41,9 +40,13 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserEventPublisher userEventPublisher;
     private final RoleService roleService;
+    private final AuthenticationCurrentUserService authenticationCurrentUserService;
 
     @Override
     public Page<UserDTO> findAll(Specification<UserModel> spec, Pageable pageable) {
+        UserDetails userDetails = (UserDetails) authenticationCurrentUserService.getAuthentication().getPrincipal();
+        log.info("Authentication {} ", userDetails.getUsername());
+
         Page<UserModel> userModelPage = userRepository.findAll(spec, pageable);
         Page<UserDTO> usersPageDTO = UserConverter.toDTOPage(userModelPage);
 
@@ -56,9 +59,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO findById(UUID userId) {
-        UserModel user = optionalUser(userId);
-        log.debug("GET UserDTO received {} ", user.toString());
-        return UserConverter.toDTO(user);
+        UUID currentUserId = authenticationCurrentUserService.getCurrentUser().getUserId();
+
+        if (currentUserId.equals(userId)) {
+            UserModel user = optionalUser(userId);
+            log.debug("GET UserDTO received {} ", user.toString());
+            return UserConverter.toDTO(user);
+        } else {
+            throw new UserDoesNotHavePermissionException("Forbidden");
+        }
     }
 
     @Transactional
