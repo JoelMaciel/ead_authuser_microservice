@@ -107,6 +107,9 @@ public class UserServiceImpl implements UserService {
         UserModel user = optionalUser(instructorRequestDTO.getUserId());
         UserModel userInstructor = UserConverter.toInstructor(user);
 
+        addInstructorRoleToUser(userInstructor);
+        log.info("Adding Role : {}", RoleType.ROLE_INSTRUCTOR);
+
         UserModel userUpdated = userRepository.save(userInstructor);
 
         userEventPublisher.publishUserEvent(UserConverter.toEventDTO(userUpdated, ActionType.UPDATE));
@@ -161,6 +164,12 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
     }
+
+    private UserModel addInstructorRoleToUser(UserModel userInstructor) {
+        RoleModel roleModel = roleService.findByRoleName(RoleType.ROLE_INSTRUCTOR);
+        return UserConverter.addRoleToUser(userInstructor, roleModel);
+    }
+
 
     private void addRoleToUser(UserModel user, RoleType roleType) {
         RoleModel role = roleService.findByRoleName(roleType);
