@@ -9,6 +9,7 @@ import com.ead.authuser.domain.dtos.response.UserEventDTO;
 import com.ead.authuser.domain.enums.ActionType;
 import com.ead.authuser.domain.enums.UserStatus;
 import com.ead.authuser.domain.enums.UserType;
+import com.ead.authuser.domain.models.RoleModel;
 import com.ead.authuser.domain.models.UserModel;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -99,6 +100,12 @@ public class UserConverter implements ApplicationContextAware {
                 .updateDate(OffsetDateTime.now())
                 .build();
     }
+
+    public static UserModel addRoleToUser(UserModel user, RoleModel role) {
+        user.getRoles().add(role);
+        return user.toBuilder().build();
+    }
+
 
     public static UserModel configureUserStatusAndType(UserModel user, UserStatus status, UserType type) {
         return user.toBuilder()

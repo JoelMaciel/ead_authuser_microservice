@@ -18,6 +18,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -42,23 +43,10 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     public static final String ENTITY_IN_USE = "Entity cannot be deleted because it is in use";
     public static final String MSG_AGAIN_IN_A_FEW_MOMENTS = "The system is currently unavailable, please try again in a few moments";
     public static final String INVALID_USERNAME_OR_PASSWORD = "Invalid username or password";
+    public static final String DO_NOT_HAVE_PERMISSION = "Access denied. You do not have permission to access this resource.";
+    public static final String NOT_HAVE_PERMISSION_TO_ACCESS_THIS_RESOURCE = "Access denied. You do not have permission to access this resource.";
 
     private final MessageSource messageSource;
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleUncaught(Exception ex, WebRequest request) {
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        ProblemType problemType = ProblemType.SYSTEM_ERROR;
-
-        String detail = MSG_GENERIC_ERROR_END_USER;
-        ex.printStackTrace();
-
-        Problem problem = createProblemBuilder(status, problemType, detail)
-                .userMessage(detail)
-                .build();
-
-        return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
-    }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<?> handleEntityNotFound(EntityNotFoundException ex, WebRequest webRequest) {
@@ -95,6 +83,20 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         Problem problem = createProblemBuilder(status, problemType, detail)
                 .userMessage(detail)
+                .build();
+
+        return handleExceptionInternal(ex, problem, new HttpHeaders(), status, webRequest);
+    }
+
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> handleAccessDenied(AccessDeniedException ex, WebRequest webRequest) {
+        HttpStatus status = HttpStatus.FORBIDDEN;
+        ProblemType problemType = ProblemType.FORBIDDEN;
+        String detail =  "Access denied";
+
+        Problem problem = createProblemBuilder(status, problemType, detail)
+                .userMessage(NOT_HAVE_PERMISSION_TO_ACCESS_THIS_RESOURCE)
                 .build();
 
         return handleExceptionInternal(ex, problem, new HttpHeaders(), status, webRequest);
@@ -237,27 +239,6 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                 .build();
 
         return handleExceptionInternal(ex, problem, headers, status, request);
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,
-                                                             HttpStatus status, WebRequest request) {
-        if (body == null) {
-            body = Problem.builder()
-                    .timestamp(OffsetDateTime.now().now())
-                    .title(status.getReasonPhrase())
-                    .status(status.value())
-                    .userMessage(MSG_GENERIC_ERROR_END_USER)
-                    .build();
-        } else if (body instanceof String) {
-            body = Problem.builder()
-                    .timestamp(OffsetDateTime.now())
-                    .title((String) body)
-                    .status(status.value())
-                    .userMessage(MSG_GENERIC_ERROR_END_USER)
-                    .build();
-        }
-        return super.handleExceptionInternal(ex, body, headers, status, request);
     }
 
     private ResponseEntity<Object> handleMethodArgumentTypeMismatch(
