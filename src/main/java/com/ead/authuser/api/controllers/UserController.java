@@ -27,7 +27,7 @@ public class UserController {
     public static final String MSG_UPDATE_PASSWORD = "Password updated successfully.";
     private final UserService userService;
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping
     public Page<UserDTO> getAllUsers(
             SpecificationTemplate.UserSpec spec,
