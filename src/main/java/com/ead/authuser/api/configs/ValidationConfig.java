@@ -1,4 +1,4 @@
-package com.ead.authuser.api.config;
+package com.ead.authuser.api.configs;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;

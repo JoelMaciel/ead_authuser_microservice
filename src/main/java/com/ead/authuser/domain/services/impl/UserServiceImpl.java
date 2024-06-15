@@ -1,25 +1,27 @@
 package com.ead.authuser.domain.services.impl;
 
+import com.ead.authuser.api.configs.security.AuthenticationCurrentUserService;
 import com.ead.authuser.api.controllers.UserController;
 import com.ead.authuser.api.publishers.UserEventPublisher;
 import com.ead.authuser.domain.converter.UserConverter;
 import com.ead.authuser.domain.dtos.request.*;
 import com.ead.authuser.domain.dtos.response.UserDTO;
 import com.ead.authuser.domain.enums.ActionType;
+import com.ead.authuser.domain.enums.RoleType;
 import com.ead.authuser.domain.enums.UserStatus;
 import com.ead.authuser.domain.enums.UserType;
-import com.ead.authuser.domain.exceptions.EmailAlreadyExistsException;
-import com.ead.authuser.domain.exceptions.PasswordMismatchedException;
-import com.ead.authuser.domain.exceptions.UserNotFoundException;
-import com.ead.authuser.domain.exceptions.UsernameAlreadyExistsException;
+import com.ead.authuser.domain.exceptions.*;
+import com.ead.authuser.domain.models.RoleModel;
 import com.ead.authuser.domain.models.UserModel;
 import com.ead.authuser.domain.repositories.UserRepository;
+import com.ead.authuser.domain.services.RoleService;
 import com.ead.authuser.domain.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -37,9 +39,14 @@ public class UserServiceImpl implements UserService {
     public static final String MSG_EMAIL_ALREADY_EXISTS = "This email is already registered in the database.";
     private final UserRepository userRepository;
     private final UserEventPublisher userEventPublisher;
+    private final RoleService roleService;
+    private final AuthenticationCurrentUserService authenticationCurrentUserService;
 
     @Override
     public Page<UserDTO> findAll(Specification<UserModel> spec, Pageable pageable) {
+        UserDetails userDetails = (UserDetails) authenticationCurrentUserService.getAuthentication().getPrincipal();
+        log.info("Authentication {} ", userDetails.getUsername());
+
         Page<UserModel> userModelPage = userRepository.findAll(spec, pageable);
         Page<UserDTO> usersPageDTO = UserConverter.toDTOPage(userModelPage);
 
@@ -52,9 +59,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO findById(UUID userId) {
-        UserModel user = optionalUser(userId);
-        log.debug("GET UserDTO received {} ", user.toString());
-        return UserConverter.toDTO(user);
+        UUID currentUserId = authenticationCurrentUserService.getCurrentUser().getUserId();
+
+        if (currentUserId.equals(userId)) {
+            UserModel user = optionalUser(userId);
+            log.debug("GET UserDTO received {} ", user.toString());
+            return UserConverter.toDTO(user);
+        } else {
+            throw new UserDoesNotHavePermissionException("Forbidden");
+        }
     }
 
     @Transactional
@@ -78,6 +91,8 @@ public class UserServiceImpl implements UserService {
 
         userModel = UserConverter.configureUserStatusAndType(userModel, UserStatus.ACTIVE, UserType.STUDENT);
 
+        addRoleToUser(userModel, RoleType.ROLE_STUDENT);
+
         UserModel userSaved = userRepository.save(userModel);
 
         userEventPublisher.publishUserEvent(UserConverter.toEventDTO(userSaved, ActionType.CREATE));
@@ -92,10 +107,13 @@ public class UserServiceImpl implements UserService {
         UserModel user = optionalUser(instructorRequestDTO.getUserId());
         UserModel userInstructor = UserConverter.toInstructor(user);
 
+        addInstructorRoleToUser(userInstructor);
+        log.info("Adding Role : {}", RoleType.ROLE_INSTRUCTOR);
+
         UserModel userUpdated = userRepository.save(userInstructor);
 
         userEventPublisher.publishUserEvent(UserConverter.toEventDTO(userUpdated, ActionType.UPDATE));
-        log.debug("UserInstructorId save and send broker {} ", userUpdated.getUserId());
+        log.info("UserInstructorId save and send broker {} ", userUpdated.getUserId());
 
         return UserConverter.toDTO(userUpdated);
     }
@@ -105,7 +123,7 @@ public class UserServiceImpl implements UserService {
     public UserDTO updateImage(UUID userId, UserUpdateImageRequestDTO updateImageDTO) {
         UserModel userModel = optionalUser(userId);
         UserModel newUser = UserConverter.toUpdateImageEntity(userModel, updateImageDTO);
-        log.debug("PATCH updated image {} ", newUser.toString());
+        log.info("PATCH updated image {} ", newUser.toString());
         return UserConverter.toDTO(userRepository.save(newUser));
     }
 
@@ -117,7 +135,7 @@ public class UserServiceImpl implements UserService {
         validatePassword(userUpdatePasswordRequestDTO, user);
 
         UserModel userUpdated = UserConverter.toUpdatePasswordEntity(user, userUpdatePasswordRequestDTO);
-        log.debug("PATCH updated password {} ", userUpdated.toString());
+        log.info("PATCH updated password {} ", userUpdated.toString());
         userRepository.save(userUpdated);
     }
 
@@ -145,6 +163,17 @@ public class UserServiceImpl implements UserService {
     public UserModel optionalUser(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
+    }
+
+    private UserModel addInstructorRoleToUser(UserModel userInstructor) {
+        RoleModel roleModel = roleService.findByRoleName(RoleType.ROLE_INSTRUCTOR);
+        return UserConverter.addRoleToUser(userInstructor, roleModel);
+    }
+
+
+    private void addRoleToUser(UserModel user, RoleType roleType) {
+        RoleModel role = roleService.findByRoleName(roleType);
+        user.getRoles().add(role);
     }
 
     private void addHateoasLinks(Page<UserDTO> usersDtos) {

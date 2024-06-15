@@ -1,19 +1,34 @@
 package com.ead.authuser.domain.converter;
 
-import com.ead.authuser.domain.dtos.request.*;
+import com.ead.authuser.domain.dtos.request.UserRequestDTO;
+import com.ead.authuser.domain.dtos.request.UserUpdateImageRequestDTO;
+import com.ead.authuser.domain.dtos.request.UserUpdatePasswordRequestDTO;
+import com.ead.authuser.domain.dtos.request.UserUpdateRequestDTO;
 import com.ead.authuser.domain.dtos.response.UserDTO;
 import com.ead.authuser.domain.dtos.response.UserEventDTO;
 import com.ead.authuser.domain.enums.ActionType;
 import com.ead.authuser.domain.enums.UserStatus;
 import com.ead.authuser.domain.enums.UserType;
+import com.ead.authuser.domain.models.RoleModel;
 import com.ead.authuser.domain.models.UserModel;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.data.domain.Page;
+import org.springframework.lang.NonNull;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
+import java.util.HashSet;
 
-public class UserConverter {
+@Component
+public class UserConverter implements ApplicationContextAware {
 
-    private UserConverter() {
+    private static ApplicationContext context;
+
+    @Override
+    public void setApplicationContext(@NonNull ApplicationContext applicationContext) {
+        context = applicationContext;
     }
 
     public static Page<UserDTO> toDTOPage(Page<UserModel> users) {
@@ -37,13 +52,16 @@ public class UserConverter {
     }
 
     public static UserModel toEntity(UserRequestDTO userRequestDTO) {
+        PasswordEncoder encoder = context.getBean(PasswordEncoder.class);
+
         return UserModel.builder()
                 .username(userRequestDTO.getUsername())
                 .email(userRequestDTO.getEmail())
-                .password(userRequestDTO.getPassword())
+                .password(encoder.encode(userRequestDTO.getPassword()))
                 .fullName(userRequestDTO.getFullName())
                 .phoneNumber(userRequestDTO.getPhoneNumber())
                 .cpf(userRequestDTO.getCpf())
+                .roles(new HashSet<>())
                 .build();
     }
 
@@ -82,6 +100,12 @@ public class UserConverter {
                 .updateDate(OffsetDateTime.now())
                 .build();
     }
+
+    public static UserModel addRoleToUser(UserModel user, RoleModel role) {
+        user.getRoles().add(role);
+        return user.toBuilder().build();
+    }
+
 
     public static UserModel configureUserStatusAndType(UserModel user, UserStatus status, UserType type) {
         return user.toBuilder()

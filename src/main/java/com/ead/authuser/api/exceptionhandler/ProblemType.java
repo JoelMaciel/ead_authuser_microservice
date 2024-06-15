@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public enum ProblemType {
     SYSTEM_ERROR("system-error", "System error"),
+    FORBIDDEN("forbidden", "Forbidden"),
     INVALID_DATA("invalid-data", "Invalid data"),
     INCOMPREHENSIBLE_MESSAGE("/incomprehesible_message", "Incomprehesible Message"),
     RESOURCE_NOT_FOUND("/resource-not-found", "Resource Not Found"),
