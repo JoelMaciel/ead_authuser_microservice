@@ -11,31 +11,26 @@ import com.ead.authuser.domain.enums.UserStatus;
 import com.ead.authuser.domain.enums.UserType;
 import com.ead.authuser.domain.models.RoleModel;
 import com.ead.authuser.domain.models.UserModel;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 
+@RequiredArgsConstructor
 @Component
-public class UserConverter implements ApplicationContextAware {
+public class UserConverter {
 
-    private static ApplicationContext context;
+    private final PasswordEncoder passwordEncoder;
 
-    @Override
-    public void setApplicationContext(@NonNull ApplicationContext applicationContext) {
-        context = applicationContext;
+
+    public Page<UserDTO> toDTOPage(Page<UserModel> users) {
+        return users.map(this::toDTO);
     }
 
-    public static Page<UserDTO> toDTOPage(Page<UserModel> users) {
-        return users.map(UserConverter::toDTO);
-    }
-
-    public static UserDTO toDTO(UserModel user) {
+    public UserDTO toDTO(UserModel user) {
         return UserDTO.builder()
                 .userId(user.getUserId())
                 .username(user.getUsername())
@@ -51,13 +46,12 @@ public class UserConverter implements ApplicationContextAware {
                 .build();
     }
 
-    public static UserModel toEntity(UserRequestDTO userRequestDTO) {
-        PasswordEncoder encoder = context.getBean(PasswordEncoder.class);
+    public UserModel toEntity(UserRequestDTO userRequestDTO) {
 
         return UserModel.builder()
                 .username(userRequestDTO.getUsername())
                 .email(userRequestDTO.getEmail())
-                .password(encoder.encode(userRequestDTO.getPassword()))
+                .password(passwordEncoder.encode(userRequestDTO.getPassword()))
                 .fullName(userRequestDTO.getFullName())
                 .phoneNumber(userRequestDTO.getPhoneNumber())
                 .cpf(userRequestDTO.getCpf())
@@ -65,7 +59,7 @@ public class UserConverter implements ApplicationContextAware {
                 .build();
     }
 
-    public static UserModel toUpdateEntity(UserUpdateRequestDTO userUpdate, UserModel user) {
+    public UserModel toUpdateEntity(UserUpdateRequestDTO userUpdate, UserModel user) {
         return user.toBuilder()
                 .username(userUpdate.getUsername())
                 .fullName(userUpdate.getFullName())
@@ -74,7 +68,7 @@ public class UserConverter implements ApplicationContextAware {
                 .build();
     }
 
-    public static UserModel toUpdatePasswordEntity(
+    public UserModel toUpdatePasswordEntity(
             UserModel user,
             UserUpdatePasswordRequestDTO userUpdatePasswordRequestDTO
     ) {
@@ -84,7 +78,7 @@ public class UserConverter implements ApplicationContextAware {
                 .build();
     }
 
-    public static UserModel toUpdateImageEntity(
+    public UserModel toUpdateImageEntity(
             UserModel user,
             UserUpdateImageRequestDTO userUpdateImageRequestDTO
     ) {
@@ -94,27 +88,27 @@ public class UserConverter implements ApplicationContextAware {
                 .build();
     }
 
-    public static UserModel toInstructor(UserModel user) {
+    public UserModel toInstructor(UserModel user) {
         return user.toBuilder()
                 .userType(UserType.INSTRUCTOR)
                 .updateDate(OffsetDateTime.now())
                 .build();
     }
 
-    public static UserModel addRoleToUser(UserModel user, RoleModel role) {
+    public UserModel addRoleToUser(UserModel user, RoleModel role) {
         user.getRoles().add(role);
         return user.toBuilder().build();
     }
 
 
-    public static UserModel configureUserStatusAndType(UserModel user, UserStatus status, UserType type) {
+    public UserModel configureUserStatusAndType(UserModel user, UserStatus status, UserType type) {
         return user.toBuilder()
                 .userStatus(status)
                 .userType(type)
                 .build();
     }
 
-    public static UserEventDTO toEventDTO(UserModel userModel, ActionType actionType) {
+    public UserEventDTO toEventDTO(UserModel userModel, ActionType actionType) {
         return UserEventDTO.builder()
                 .userId(userModel.getUserId())
                 .username(userModel.getUsername())
