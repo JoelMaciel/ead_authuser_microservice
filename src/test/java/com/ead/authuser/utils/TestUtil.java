@@ -9,12 +9,13 @@ import com.ead.authuser.domain.enums.UserType;
 import com.ead.authuser.domain.models.UserModel;
 
 import java.time.OffsetDateTime;
+import java.util.HashSet;
 import java.util.UUID;
 
 public class TestUtil {
 
     public static UserModel getUserModelMock() {
-        return UserModel.builder()
+        UserModel user = UserModel.builder()
                 .userId(UUID.randomUUID())
                 .username("joelmacieltest")
                 .email("joelteste@example.com")
@@ -24,9 +25,12 @@ public class TestUtil {
                 .userStatus(UserStatus.ACTIVE)
                 .userType(UserType.STUDENT)
                 .cpf("908599956565")
+                .roles(new HashSet<>())
                 .creationDate(OffsetDateTime.now())
                 .updateDate(OffsetDateTime.now())
                 .build();
+
+        return user;
     }
 
     public static UserRequestDTO getUserRequestDTOMock() {

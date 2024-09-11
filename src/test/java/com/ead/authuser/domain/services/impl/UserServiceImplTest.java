@@ -1,13 +1,22 @@
 package com.ead.authuser.domain.services.impl;
 
+import com.ead.authuser.api.configs.security.AuthenticationCurrentUserService;
+import com.ead.authuser.api.configs.security.UserDetailsImpl;
+import com.ead.authuser.api.publishers.UserEventPublisher;
+import com.ead.authuser.domain.converter.UserConverter;
 import com.ead.authuser.domain.dtos.request.UserRequestDTO;
 import com.ead.authuser.domain.dtos.request.UserUpdateImageRequestDTO;
 import com.ead.authuser.domain.dtos.request.UserUpdatePasswordRequestDTO;
 import com.ead.authuser.domain.dtos.request.UserUpdateRequestDTO;
 import com.ead.authuser.domain.dtos.response.UserDTO;
+import com.ead.authuser.domain.enums.RoleType;
+import com.ead.authuser.domain.enums.UserStatus;
+import com.ead.authuser.domain.enums.UserType;
 import com.ead.authuser.domain.exceptions.UserNotFoundException;
+import com.ead.authuser.domain.models.RoleModel;
 import com.ead.authuser.domain.models.UserModel;
 import com.ead.authuser.domain.repositories.UserRepository;
+import com.ead.authuser.domain.services.RoleService;
 import com.ead.authuser.domain.specification.SpecificationTemplate;
 import com.ead.authuser.utils.TestUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +30,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +48,19 @@ class UserServiceImplTest {
     private UserServiceImpl userService;
 
     @Mock
+    private UserConverter userConverter;
+
+    @Mock
+    private RoleService roleService;
+
+    @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private UserEventPublisher userEventPublisher;
+
+    @Mock
+    private AuthenticationCurrentUserService authenticationCurrentUserService;
 
     @Captor
     private ArgumentCaptor<UserModel> userModelCaptor;
@@ -45,16 +69,17 @@ class UserServiceImplTest {
     private UserRequestDTO userRequestDTO;
     private UserUpdateRequestDTO userUpdateRequestDTO;
     private UUID invalidUserId;
+    private RoleModel roleModel;
 
 
     @BeforeEach
     void setUp() {
         openMocks(this);
 
-        userModel = TestUtil.getUserModelMock();
-        userRequestDTO = TestUtil.getUserRequestDTOMock();
-        userUpdateRequestDTO = TestUtil.getUserUpdateRequestDTO();
-        invalidUserId = UUID.randomUUID();
+        initializeTestObjects();
+        configureSecurityContext();
+        roleModel = new RoleModel(UUID.randomUUID(), RoleType.ROLE_STUDENT);
+
     }
 
     @Test
@@ -76,7 +101,9 @@ class UserServiceImplTest {
     @Test
     @DisplayName("Given Valid UserId When FindById Then Must Return User Successfully")
     void givenValidUserId_WhenFindById_ThenMustReturnUserSuccessfully() {
+        when(authenticationCurrentUserService.getCurrentUser()).thenReturn(UserDetailsImpl.build(userModel));
         when(userRepository.findById(any(UUID.class))).thenReturn(Optional.of(userModel));
+
         UserDTO userDTO = userService.findById(userModel.getUserId());
 
         assertNotNull(userDTO);
@@ -103,22 +130,34 @@ class UserServiceImplTest {
     @Test
     @DisplayName("Given UserRequestDTO Valid When Save User Then Should Save User Successfully")
     void givenUserValid_WhenSaveUser_ThenShouldSaveUserSuccessfully() {
+        when(userConverter.toEntity(any(UserRequestDTO.class))).thenReturn(userModel);
         when(userRepository.save(any(UserModel.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(roleService.findByRoleName(RoleType.ROLE_STUDENT)).thenReturn(roleModel);
+
+        UserDTO expectedUserDTO = new UserDTO();
+        expectedUserDTO.setUserId(userModel.getUserId());
+        expectedUserDTO.setUsername(userModel.getUsername());
+        expectedUserDTO.setEmail(userModel.getEmail());
+        expectedUserDTO.setUserStatus(UserStatus.ACTIVE.name());
+        expectedUserDTO.setUserType(UserType.STUDENT.name());
+
+        when(userConverter.toDTO(any(UserModel.class))).thenReturn(expectedUserDTO);
+        when(userRepository.existsByUsername(userRequestDTO.getUsername())).thenReturn(false);
+        when(userRepository.existsByEmail(userRequestDTO.getEmail())).thenReturn(false);
 
         UserDTO userDTO = userService.save(userRequestDTO);
 
         assertNotNull(userDTO);
         assertEquals(userRequestDTO.getUsername(), userDTO.getUsername());
         assertEquals(userRequestDTO.getEmail(), userDTO.getEmail());
+        assertEquals(UserStatus.ACTIVE.name(), userDTO.getUserStatus());
+        assertEquals(UserType.STUDENT.name(), userDTO.getUserType());
 
-        String userStatusExpected = "ACTIVE";
-        String userTypeExpected = "STUDENT";
-
-        assertEquals(userStatusExpected, userDTO.getUserStatus());
-        assertEquals(userTypeExpected, userDTO.getUserType());
-
-        verify(userRepository, times(1)).save(any(UserModel.class));
+        verify(userRepository, times(1)).save(userModel);
+        assertTrue(userModel.getRoles().contains(roleModel));
+        verify(userEventPublisher, times(1)).publishUserEvent(any());
     }
+
 
     @Test
     @DisplayName("Given Valid UserUpdateRequestDTO When Update User Then Should Update User Name Successfully")
@@ -242,4 +281,23 @@ class UserServiceImplTest {
         verify(userRepository, times(1)).findById(invalidUserId);
         verify(userRepository, never()).deleteById(userModel.getUserId());
     }
+
+    private void configureSecurityContext() {
+        UserDetailsImpl userDetails = UserDetailsImpl.build(userModel);
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken(userDetails, null);
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(authentication);
+        SecurityContextHolder.setContext(securityContext);
+    }
+
+    private void initializeTestObjects() {
+        userModel = TestUtil.getUserModelMock();
+        userRequestDTO = TestUtil.getUserRequestDTOMock();
+        userUpdateRequestDTO = TestUtil.getUserUpdateRequestDTO();
+        invalidUserId = UUID.randomUUID();
+
+        RoleModel studentRole = new RoleModel(UUID.randomUUID(), RoleType.ROLE_STUDENT);
+        userModel.getRoles().add(studentRole);
+    }
+
 }
