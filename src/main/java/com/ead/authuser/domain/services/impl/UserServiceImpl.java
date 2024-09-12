@@ -38,6 +38,7 @@ public class UserServiceImpl implements UserService {
     public static final String MSG_USERNAME_ALREADY_EXISTS = "There is already a user registered with this Username.";
     public static final String MSG_EMAIL_ALREADY_EXISTS = "This email is already registered in the database.";
     private final UserRepository userRepository;
+    private final UserConverter userConverter;
     private final UserEventPublisher userEventPublisher;
     private final RoleService roleService;
     private final AuthenticationCurrentUserService authenticationCurrentUserService;
@@ -48,7 +49,7 @@ public class UserServiceImpl implements UserService {
         log.info("Authentication {} ", userDetails.getUsername());
 
         Page<UserModel> userModelPage = userRepository.findAll(spec, pageable);
-        Page<UserDTO> usersPageDTO = UserConverter.toDTOPage(userModelPage);
+        Page<UserDTO> usersPageDTO = userConverter.toDTOPage(userModelPage);
 
         addHateoasLinks(usersPageDTO);
 
@@ -64,7 +65,7 @@ public class UserServiceImpl implements UserService {
         if (currentUserId.equals(userId)) {
             UserModel user = optionalUser(userId);
             log.debug("GET UserDTO received {} ", user.toString());
-            return UserConverter.toDTO(user);
+            return userConverter.toDTO(user);
         } else {
             throw new UserDoesNotHavePermissionException("Forbidden");
         }
@@ -74,57 +75,57 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO update(UUID userId, UserUpdateRequestDTO userUpdateDTO) {
         UserModel user = optionalUser(userId);
-        UserModel userUpdate = UserConverter.toUpdateEntity(userUpdateDTO, user);
+        UserModel userUpdate = userConverter.toUpdateEntity(userUpdateDTO, user);
         userRepository.save(userUpdate);
-        userEventPublisher.publishUserEvent(UserConverter.toEventDTO(userUpdate, ActionType.UPDATE));
+        userEventPublisher.publishUserEvent(userConverter.toEventDTO(userUpdate, ActionType.UPDATE));
         log.debug("UPDATE User and send broker {} -> ", userUpdate.toString());
-        return UserConverter.toDTO(userUpdate);
+        return userConverter.toDTO(userUpdate);
     }
 
     @Transactional
     @Override
     public UserDTO save(UserRequestDTO userRequestDTO) {
         log.debug("POST registerUser UserRequestDTO received {} ", userRequestDTO.toString());
-        UserModel userModel = UserConverter.toEntity(userRequestDTO);
+        UserModel userModel = userConverter.toEntity(userRequestDTO);
 
         validateUser(userRequestDTO);
 
-        userModel = UserConverter.configureUserStatusAndType(userModel, UserStatus.ACTIVE, UserType.STUDENT);
+        userModel = userConverter.configureUserStatusAndType(userModel, UserStatus.ACTIVE, UserType.STUDENT);
 
         addRoleToUser(userModel, RoleType.ROLE_STUDENT);
 
         UserModel userSaved = userRepository.save(userModel);
 
-        userEventPublisher.publishUserEvent(UserConverter.toEventDTO(userSaved, ActionType.CREATE));
+        userEventPublisher.publishUserEvent(userConverter.toEventDTO(userSaved, ActionType.CREATE));
         log.debug("POST - UserModel saved and send broker ->  {} ", userSaved.toString());
 
-        return UserConverter.toDTO(userSaved);
+        return userConverter.toDTO(userSaved);
     }
 
     @Override
     @Transactional
     public UserDTO saveInstructor(InstructorRequestDTO instructorRequestDTO) {
         UserModel user = optionalUser(instructorRequestDTO.getUserId());
-        UserModel userInstructor = UserConverter.toInstructor(user);
+        UserModel userInstructor = userConverter.toInstructor(user);
 
         addInstructorRoleToUser(userInstructor);
         log.info("Adding Role : {}", RoleType.ROLE_INSTRUCTOR);
 
         UserModel userUpdated = userRepository.save(userInstructor);
 
-        userEventPublisher.publishUserEvent(UserConverter.toEventDTO(userUpdated, ActionType.UPDATE));
+        userEventPublisher.publishUserEvent(userConverter.toEventDTO(userUpdated, ActionType.UPDATE));
         log.info("UserInstructorId save and send broker {} ", userUpdated.getUserId());
 
-        return UserConverter.toDTO(userUpdated);
+        return userConverter.toDTO(userUpdated);
     }
 
     @Override
     @Transactional
     public UserDTO updateImage(UUID userId, UserUpdateImageRequestDTO updateImageDTO) {
         UserModel userModel = optionalUser(userId);
-        UserModel newUser = UserConverter.toUpdateImageEntity(userModel, updateImageDTO);
+        UserModel newUser = userConverter.toUpdateImageEntity(userModel, updateImageDTO);
         log.info("PATCH updated image {} ", newUser.toString());
-        return UserConverter.toDTO(userRepository.save(newUser));
+        return userConverter.toDTO(userRepository.save(newUser));
     }
 
     @Override
@@ -134,7 +135,7 @@ public class UserServiceImpl implements UserService {
 
         validatePassword(userUpdatePasswordRequestDTO, user);
 
-        UserModel userUpdated = UserConverter.toUpdatePasswordEntity(user, userUpdatePasswordRequestDTO);
+        UserModel userUpdated = userConverter.toUpdatePasswordEntity(user, userUpdatePasswordRequestDTO);
         log.info("PATCH updated password {} ", userUpdated.toString());
         userRepository.save(userUpdated);
     }
@@ -145,7 +146,7 @@ public class UserServiceImpl implements UserService {
         UserModel userModel = optionalUser(userId);
         userRepository.deleteById(userId);
 
-        userEventPublisher.publishUserEvent(UserConverter.toEventDTO(userModel, ActionType.DELETE));
+        userEventPublisher.publishUserEvent(userConverter.toEventDTO(userModel, ActionType.DELETE));
         log.info("UserModel Deleted and send broker {} ", userId);
     }
 
@@ -167,7 +168,7 @@ public class UserServiceImpl implements UserService {
 
     private UserModel addInstructorRoleToUser(UserModel userInstructor) {
         RoleModel roleModel = roleService.findByRoleName(RoleType.ROLE_INSTRUCTOR);
-        return UserConverter.addRoleToUser(userInstructor, roleModel);
+        return userConverter.addRoleToUser(userInstructor, roleModel);
     }
 
 
