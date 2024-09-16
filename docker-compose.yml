@@ -37,6 +37,18 @@ services:
     networks:
       - mynetwork
 
+  postgres_payment:
+    image: postgres
+    container_name: postgres-payment
+    environment:
+      POSTGRES_DB: payment
+      POSTGRES_USER: joel
+      POSTGRES_PASSWORD: docker
+    ports:
+      - "5436:5432"
+    networks:
+      - mynetwork
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
